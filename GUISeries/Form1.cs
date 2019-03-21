@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net.Http;
 
 namespace GUISeries
 {
@@ -43,8 +44,7 @@ namespace GUISeries
             //#1 end.
         }
 
-
-        private void lstVIew_ItemClicked(object sender, EventArgs e)
+        private void lstVIew_ItemActivated(object sender, EventArgs e)
         {
             //When i make the api request i will put the serie names in the list view, here is one way of doing so, you take the strings 
             //and put them into the listview1. Then when the user clicks one you check which one is selected and get the name from there.
@@ -64,7 +64,27 @@ namespace GUISeries
             }
 
             MessageBox.Show(lstView_SeriesFromAPI.SelectedItems[0].Name);
+        }
+        async Task<List<CLSerie>> GetSerie()
+        {
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("http://kitsu.com.io/api/edge");
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            HttpResponseMessage response = await client.GetAsync("anime?filter[text]=snafu");
+            if(response.IsSuccessStatusCode)
+            {
+                var test = await response.Content.ReadAsStringAsync();
+                MessageBox.Show(test);
+            }
+            return new List<CLSerie>();
+        }
 
+        private void btn_ConfirmSearch_Click(object sender, EventArgs e)
+        {
+            AddSeries a = new AddSeries();
+            a.Show();
+            //GetSerie().GetAwaiter().GetResult();
         }
     }
 }

@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GUISeries
 {
     class CLSerie : CLEpisode
     {
-        List<CLEpisode> episodes;
-        string status;
-        string name;
-        int? episodeCount;
-        List<string> genres;
-        DateTime aired;
+        public List<CLEpisode> episodes;
+        public string status;
+        public string name;
+        public int? episodeCount;
+        public List<string> genres;
+        public DateTime aired;
     }
 }

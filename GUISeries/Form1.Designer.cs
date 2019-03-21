@@ -50,15 +50,16 @@
             this.btn_ConfirmSearch.TabIndex = 1;
             this.btn_ConfirmSearch.Text = "OK";
             this.btn_ConfirmSearch.UseVisualStyleBackColor = true;
+            this.btn_ConfirmSearch.Click += new System.EventHandler(this.btn_ConfirmSearch_Click);
             // 
             // lstView_SeriesFromAPI
             // 
-            this.lstView_SeriesFromAPI.Location = new System.Drawing.Point(255, 172);
+            this.lstView_SeriesFromAPI.Location = new System.Drawing.Point(219, 141);
             this.lstView_SeriesFromAPI.Name = "lstView_SeriesFromAPI";
-            this.lstView_SeriesFromAPI.Size = new System.Drawing.Size(279, 149);
+            this.lstView_SeriesFromAPI.Size = new System.Drawing.Size(337, 149);
             this.lstView_SeriesFromAPI.TabIndex = 2;
             this.lstView_SeriesFromAPI.UseCompatibleStateImageBehavior = false;
-            this.lstView_SeriesFromAPI.ItemActivate += new System.EventHandler(this.lstVIew_ItemClicked);
+            this.lstView_SeriesFromAPI.ItemActivate += new System.EventHandler(this.lstVIew_ItemActivated);
             // 
             // Form1
             // 

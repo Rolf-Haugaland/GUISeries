@@ -8,11 +8,11 @@ namespace GUISeries
 {
     class CLEpisode
     {
-        int? totalLength;
-        List<int> lengthPerEpisode;
-        string name;
-        string synopsis;
-        DateTime airDate;
-        string showName;
+        public int? totalLength;
+        public List<int> lengthPerEpisode;
+        public string name;
+        public string synopsis;
+        public DateTime airDate;
+        public string showName;
     }
 }
