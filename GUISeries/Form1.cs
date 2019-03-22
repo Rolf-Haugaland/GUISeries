@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Http;
@@ -16,6 +17,44 @@ namespace GUISeries
         public Form1()
         {
             InitializeComponent();
+            StartupCheck();
+        }
+
+        void StartupCheck()
+        {
+            if (!File.Exists("Settings.txt"))
+                File.Create("Settings.txt").Close();
+            if (CheckConfiguration())
+            {
+                DialogResult result = MessageBox.Show("Det ser ikke ut at du har lagt til en database enda, vil du gjøre det nå?", "Konfigurere database?", MessageBoxButtons.YesNo);
+                if(result == DialogResult.Yes)
+                {
+                    DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration();
+                    databaseConfiguration.ShowDialog();
+                }
+            }
+        }
+
+        bool CheckConfiguration()
+        {
+            ConfigurationManager manager = new ConfigurationManager();
+            List<string> AllPresentSettings = manager.GetAllSettingsWithoutValues();
+            string DefaultDatabase = manager.GetSetting("Default Database");
+            if (CheckStrings(AllPresentSettings,"Database" + DefaultDatabase + " Name", "Database" + DefaultDatabase + " IP", "Database" + DefaultDatabase + " Port", "Database" + DefaultDatabase + " Username", "Database" + DefaultDatabase + " Password") && manager.CheckDatabaseFromFile())
+                return false;
+            else
+                return true;
+        }
+
+        bool CheckStrings(List<string> listStrings, params string[] strings)
+        {
+            foreach(string s in strings)
+            {
+                if (!listStrings.Contains(s, StringComparer.CurrentCultureIgnoreCase))
+                    return false;
+            }
+
+            return true;
         }
 
         List<string> GetSerieNames()
@@ -85,6 +124,12 @@ namespace GUISeries
             AddSeries a = new AddSeries();
             a.Show();
             //GetSerie().GetAwaiter().GetResult();
+        }
+
+        private void MnStrp_ConfigureDB(object sender, EventArgs e)
+        {
+            DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration();
+            databaseConfiguration.ShowDialog();
         }
     }
 }

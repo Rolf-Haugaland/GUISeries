@@ -13,7 +13,7 @@ namespace GUISeries
         private void MenStrp_HelpClick(object sender, EventArgs e)
         {
             DisplayInformation Info = new DisplayInformation();
-            Info.setup("AddSeries.Help");
+            Info.Setup("AddSeries.Help");
             Info.ShowDialog();
         }
 
@@ -39,7 +39,7 @@ namespace GUISeries
             int startingEpisode;
             int endingEpisode;
 
-            int fIntLength = fInt(episode);
+            int fIntLength = FInt(episode);
 
             startingEpisode = int.Parse(episode.Substring(0, fIntLength));
             endingEpisode = int.Parse(episode.Substring(fIntLength + 1, (episode.Length - fIntLength) - 1));
@@ -47,7 +47,7 @@ namespace GUISeries
             return startingEpisode.ToString() + "-" + endingEpisode.ToString();
         }
 
-        int fInt(string episode)
+        int FInt(string episode)
         {
             for (int i = 0; episode.Length > i; i++)
             {

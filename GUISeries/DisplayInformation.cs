@@ -17,7 +17,7 @@ namespace GUISeries
             InitializeComponent();
         }
 
-        public void setup(string Action)
+        public void Setup(string Action)
         {
             if(Action == "AddSeries.Help")
             {
