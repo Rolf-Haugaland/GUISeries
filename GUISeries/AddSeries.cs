@@ -10,6 +10,22 @@ namespace GUISeries
             InitializeComponent();
         }
 
+        CLSerie currentSerie = null;
+
+        public void Initialize(CLSerie serie)
+        {
+            lbl_Heading.Text = serie.name + ", which episodes have you watched ?";
+            currentSerie = serie;
+            ConfigurationManager manager = new ConfigurationManager();
+            int currentEpisode = manager.LatestEpisode(serie.name) + 1;
+            txt_EpisodesWatched.Text = currentEpisode.ToString() + "-" + currentEpisode.ToString(); ;
+        }
+
+        void AddSerie(CLSerie serie)
+        {
+
+        }
+
         private void MenStrp_HelpClick(object sender, EventArgs e)
         {
             DisplayInformation Info = new DisplayInformation();
@@ -27,6 +43,21 @@ namespace GUISeries
             {
                 txt_EpisodesWatched.Text = AddOne(txt_EpisodesWatched.Text);
             }
+            if (e.KeyCode == Keys.Down && !string.IsNullOrWhiteSpace(txt_EpisodesWatched.Text))
+                txt_EpisodesWatched.Text = RemoveOne(txt_EpisodesWatched.Text);
+        }
+
+        string RemoveOne(string episode)
+        {
+            int startingEpisode;
+            int endingEpisode;
+
+            int fIntLength = FInt(episode);
+
+            startingEpisode = int.Parse(episode.Substring(0, fIntLength));
+            endingEpisode = int.Parse(episode.Substring(fIntLength + 1, (episode.Length - fIntLength) - 1));
+            endingEpisode -= 1;
+            return startingEpisode.ToString() + "-" + endingEpisode.ToString();
         }
 
         /// <summary>
@@ -62,6 +93,8 @@ namespace GUISeries
         {
             if(e.KeyCode == Keys.Up && !string.IsNullOrWhiteSpace(txt_EpisodesWatched.Text))
                 txt_EpisodesWatched.Text = AddOne(txt_EpisodesWatched.Text);
+            if (e.KeyCode == Keys.Down && !string.IsNullOrWhiteSpace(txt_EpisodesWatched.Text))
+                txt_EpisodesWatched.Text = RemoveOne(txt_EpisodesWatched.Text);
         }
     }
 }

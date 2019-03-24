@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace GUISeries
 {
@@ -20,30 +21,43 @@ namespace GUISeries
             StartupCheck();
         }
 
-        void StartupCheck()
+        List<CLSerie> currentList = new List<CLSerie>();
+
+        void SetFunctionalDatabase()
         {
-            if (!File.Exists("Settings.txt"))
-                File.Create("Settings.txt").Close();
-            if (CheckConfiguration())
+            ConfigurationManager manager = new ConfigurationManager();
+            List<Database> databases = manager.GetFunctionalDatabases();
+
+            if (databases.Count == 0)
             {
-                DialogResult result = MessageBox.Show("Det ser ikke ut at du har lagt til en database enda, vil du gjøre det nå?", "Konfigurere database?", MessageBoxButtons.YesNo);
-                if(result == DialogResult.Yes)
+                DialogResult result = MessageBox.Show("Det ser ikke ut at du har lagt til en funksjonell database enda, vil du gjøre det nå?", "Konfigurere database?", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
                 {
-                    DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration();
+                    AddDatabase databaseConfiguration = new AddDatabase();
                     databaseConfiguration.ShowDialog();
+                    SetFunctionalDatabase();
                 }
+                else if (result == DialogResult.No)
+                    lbl_CurrentDatabase.Text = "Current database: No functional database found";
+            }
+            else if(databases.Count == 1)
+            {
+                StaticInfo.CurrentDatabase = databases[0];
+                lbl_CurrentDatabase.Text = "Current database: " + StaticInfo.CurrentDatabase.DatabaseName;
+            }
+            else if(databases.Count > 1)
+            {
+                SetDatabase setDatabase = new SetDatabase();
+                setDatabase.ShowDialog();
             }
         }
 
-        bool CheckConfiguration()
+        void StartupCheck()
         {
-            ConfigurationManager manager = new ConfigurationManager();
-            List<string> AllPresentSettings = manager.GetAllSettingsWithoutValues();
-            string DefaultDatabase = manager.GetSetting("Default Database");
-            if (CheckStrings(AllPresentSettings,"Database" + DefaultDatabase + " Name", "Database" + DefaultDatabase + " IP", "Database" + DefaultDatabase + " Port", "Database" + DefaultDatabase + " Username", "Database" + DefaultDatabase + " Password") && manager.CheckDatabaseFromFile())
-                return false;
-            else
-                return true;
+            //Creates a settings file if it doesent already exist
+            if (!File.Exists("Settings.txt"))
+                File.Create("Settings.txt").Close();
+            SetFunctionalDatabase();
         }
 
         bool CheckStrings(List<string> listStrings, params string[] strings)
@@ -53,7 +67,6 @@ namespace GUISeries
                 if (!listStrings.Contains(s, StringComparer.CurrentCultureIgnoreCase))
                     return false;
             }
-
             return true;
         }
 
@@ -102,34 +115,89 @@ namespace GUISeries
                 return;
             }
 
-            MessageBox.Show(lstView_SeriesFromAPI.SelectedItems[0].Name);
+            AddSeries addSeries = new AddSeries();
+            CLSerie serie = currentList.Find(x => x.name == lstView_SeriesFromAPI.SelectedItems[0].Name);
+            addSeries.Initialize(serie);
+            addSeries.Show();
         }
-        async Task<List<CLSerie>> GetSerie()
+        public async Task<List<CLSerie>> GetSerie(string SearchQuery)
         {
+
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://kitsu.com.io/api/edge");
-            client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            HttpResponseMessage response = await client.GetAsync("anime?filter[text]=snafu");
-            if(response.IsSuccessStatusCode)
+
+            List<CLSerie> Series = new List<CLSerie>();
+
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.api+json"));
+            using (HttpResponseMessage response = client.GetAsync("https://kitsu.io/api/edge/anime?filter[text]=" + SearchQuery).Result)
             {
-                var test = await response.Content.ReadAsStringAsync();
-                MessageBox.Show(test);
+                if (response.IsSuccessStatusCode)
+                {
+                    var x = await response.Content.ReadAsStringAsync();
+                    JObject y = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(x);
+                    var FirstSerie = y.Children().Children().Children().ToArray();
+                    foreach(JToken child in FirstSerie)
+                    {
+                        try
+                        {
+                            JObject child2 = (JObject)child;
+                            if (child2.TryGetValue("id", out JToken JSerie))
+                            {
+                                Series.Add(GetSeriesFromJson(child2));
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            //The conversion might fail it there is only one item in child etc. This happends every time so we just try catch the expected error.
+                        }
+                    }
+                }
             }
-            return new List<CLSerie>();
+
+            return Series;
+        }
+
+        CLSerie GetSeriesFromJson(JObject JSerie)
+        {
+            JToken attributes = JSerie.GetValue("attributes");
+
+            JObject jObject = (JObject)attributes;
+
+            CLSerie add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLSerie>(jObject.ToString());
+
+            return add;
         }
 
         private void btn_ConfirmSearch_Click(object sender, EventArgs e)
         {
-            AddSeries a = new AddSeries();
-            a.Show();
-            //GetSerie().GetAwaiter().GetResult();
+            List<CLSerie> Series = GetSerie(txt_Search.Text).GetAwaiter().GetResult();
+            currentList = Series;
+            foreach(CLSerie Serie in Series)
+            {
+                lstView_SeriesFromAPI.Items.Add(Serie.name, Serie.name, Serie.name);
+            }
         }
 
         private void MnStrp_ConfigureDB(object sender, EventArgs e)
         {
-            DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration();
+            AddDatabase databaseConfiguration = new AddDatabase();
             databaseConfiguration.ShowDialog();
+        }
+
+        private void MnStrp_RemoveDB(object sender, EventArgs e)
+        {
+            RemoveDatabase rmdb = new RemoveDatabase();
+            rmdb.ShowDialog();
+            ConfigurationManager manager = new ConfigurationManager();
+            List<Database> databases = manager.GetFunctionalDatabases();
+            if(databases.Count == 0)
+            {
+                lbl_CurrentDatabase.Text = "Current database: No functional database found";
+            }
+        }
+
+        private void mnStrp_SetDB(object sender, EventArgs e)
+        {
+
         }
     }
 }

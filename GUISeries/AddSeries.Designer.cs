@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
+            this.lbl_Heading = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -37,15 +37,15 @@
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // label1
+            // lbl_Heading
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
-            this.label1.Location = new System.Drawing.Point(143, 32);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(474, 25);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "\"Name of series\", which episodes have you watched?";
+            this.lbl_Heading.AutoSize = true;
+            this.lbl_Heading.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.lbl_Heading.Location = new System.Drawing.Point(143, 32);
+            this.lbl_Heading.Name = "lbl_Heading";
+            this.lbl_Heading.Size = new System.Drawing.Size(474, 25);
+            this.lbl_Heading.TabIndex = 0;
+            this.lbl_Heading.Text = "\"Name of series\", which episodes have you watched?";
             // 
             // textBox1
             // 
@@ -96,7 +96,7 @@
             this.Controls.Add(this.txt_EpisodesWatched);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lbl_Heading);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "AddSeries";
@@ -111,7 +111,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lbl_Heading;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.MenuStrip menuStrip1;

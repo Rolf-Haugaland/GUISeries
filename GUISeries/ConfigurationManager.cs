@@ -3,151 +3,164 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json.Linq;
 
 namespace GUISeries
 {
     class ConfigurationManager
     {
-        private List<List<string>> GetAllSettingsBP(List<string> Settings)
+        public int LatestEpisode(string SerieName)
         {
-            List<List<string>> ACSettings = new List<List<string>>();
-
-            foreach (string s in Settings)
+            MySqlCommand cmd = new MySqlCommand("Select * from Series where Name = '" + SerieName + "'");
+            MySqlConnection con = new MySqlConnection("Server=192.168.10.20;Database=GUISeries;User Id=root;Password=Perolsen1;Port=3000; ");
+            cmd.Connection = con;
+            con.Open();
+            MySqlDataReader reader = cmd.ExecuteReader();
+            List<int> Episodes = new List<int>();
+            while (reader.Read())
             {
-                for (int i = 0; s.Length > i; i++)
-                {
-                    if (s[i] == '#' && s[i + 1] == ':')
-                    {
-                        List<string> Items = new List<string>();
-                        Items.Add(s.Substring(0, i));
-                        Items.Add(s.Substring(i + 2, s.Length - (i + 2)));
-                        ACSettings.Add(Items);
-                    }
-                }
-            }
-            return ACSettings;
-        }
-
-        public List<List<string>> GetAllSettings()
-        {
-            List<string> Settings = new List<string>(File.ReadAllLines("Settings.txt"));
-
-            return GetAllSettingsBP(Settings);
-        }
-
-        public List<string> GetAllSettingsWithoutValues()
-        {
-            List<string> Settings = new List<string>(File.ReadAllLines("Settings.txt"));
-
-            List<List<string>> ACSettings = GetAllSettingsBP(Settings);
-
-            List<string> AllPresentSettings = ACSettings.SelectMany(x => x).ToList();
-            bool EveryOther = false;
-
-            for (int i = 0; AllPresentSettings.Count > i; i++)
-            {
-                if (EveryOther)
-                    AllPresentSettings[i] = "#remove me#";
-                EveryOther = !EveryOther;
+               Episodes.Add(Convert.ToInt16(reader["EpisodeNumber"]));
             }
 
-            var c = AllPresentSettings.RemoveAll(x => x == "#remove me#");
-
-            return AllPresentSettings;
-        }
-
-        public void AddSetting(string setting, string value)
-        {
-            List<string> Settings = new List<string>(File.ReadAllLines("Settings.txt"));
-
-            List<List<string>> ACSettings = GetAllSettingsBP(Settings);
-
-            List<string> NewSetting = new List<string>();
-            NewSetting.Add(setting);
-            NewSetting.Add(value);
-
-            ACSettings.Add(NewSetting);
-
-            string[] ToFile = new string[ACSettings.Count];
-            for (int i = 0; ACSettings.Count > i; i++)
-            {
-                ToFile[i] = ACSettings[i][0] + "#:" + ACSettings[i][1];
-            }
-            File.WriteAllLines("Settings.txt", ToFile);
-        }
-
-        public void SetSetting(string setting, string value)
-        {
-            List<string> Settings = new List<string>(File.ReadAllLines("Settings.txt"));
-            List<List<string>> ACSettings = GetAllSettingsBP(Settings);
-
-            int index = GetIndex(ACSettings, setting);
-            if(index == -1)
-                throw new Exception("SetSetting method in SetingFileManager did not find setting(GetIndex returned -1)");
-            ACSettings[index][1] = value;
-            string[] ToFile = new string[ACSettings.Count];
-            for (int i = 0; ACSettings.Count > i; i++)
-            {
-                ToFile[i] = ACSettings[i][0] + "#:" + ACSettings[i][1];
-            }
-            File.WriteAllLines("Settings.txt", ToFile);
+            return Episodes.Max();
         }
 
         /// <summary>
-        /// Returns the result of a setting. Searching for a setting will return its value only. Example: GetSetting("Default Database") will return 1 or 2 or 3 etc, 
-        /// depending on what the default database is. It only returns the value of the setting. 
+        /// returns all the databases in the Settings.txt working or not. GetFunctionalDatabases() only returns functional databases
         /// </summary>
-        /// <param name="setting">The setting to look for. Example: Default Database or Database1 Name</param>
-        /// <returns></returns>
-        public string GetSetting(string setting)
+        /// <returns>All databases in the Settings.txt file, connectable or not</returns>
+        public List<Database> GetDatabases()
         {
-            List<string> Settings = new List<string>(File.ReadAllLines("Settings.txt"));
-            List<List<string>> ACSettings = GetAllSettingsBP(Settings);
+            string allDatabases = File.ReadAllText("Settings.txt");
 
-            int index = GetIndex(ACSettings, setting);
-            if (index == -1)
-                return "";
+            if (!string.IsNullOrWhiteSpace(allDatabases))
+            {
+                return GetDBFromJsonString(allDatabases);
+            }
+
+            return new List<Database>();
+        }
+
+        private List<Database> GetDBFromJsonString(string JsonString)
+        {
+            List<Database> databases = new List<Database>();
+            JArray jArray = (JArray)Newtonsoft.Json.JsonConvert.DeserializeObject(JsonString);
+            foreach (JObject DB in jArray)
+            {
+                databases.Add(new Database()
+                {
+                    DatabaseName = DB.SelectToken("DatabaseName").ToString(),
+                    DatabaseIP = DB.SelectToken("DatabaseIP").ToString(),
+                    DatabasePort = DB.SelectToken("DatabasePort").ToString(),
+                    DatabasePW = DB.SelectToken("DatabasePW").ToString(),
+                    DatabaseUname = DB.SelectToken("DatabaseUname").ToString(),
+                    DefaultDB = Convert.ToBoolean(DB.SelectToken("DefaultDB").ToString())
+                });
+            }
+            return databases;
+        }
+
+        public void OverWriteDatabases(List<Database> databases)
+        {
+            string data = Newtonsoft.Json.JsonConvert.SerializeObject(databases);
+            File.WriteAllText("Settings.txt", data);
+        }
+
+        public void RemoveDatabase(Database database)
+        {
+            List<Database> databases = new List<Database>();
+            string currentDatabases = File.ReadAllText("Settings.txt");
+            if (!string.IsNullOrWhiteSpace(currentDatabases))
+                databases = GetDBFromJsonString(currentDatabases);
+            //Loops through all the databases to find the one to remove. Once it is found it removes it and stops the function.
+            for (int i = 0; databases.Count > i; i++)
+            {
+                if (DatabaseCheckEqual(databases[i], database))
+                {
+                    databases.RemoveAt(i);
+                    OverWriteDatabases(databases);
+                    return;
+                }
+            }
+        }
+
+        public int AddDatabase(Database database)
+        {
+            //The list that will be written to the file
+            List<Database> databases = new List<Database>();
+
+            string currentDatabases = File.ReadAllText("Settings.txt");
+            if (!string.IsNullOrWhiteSpace(currentDatabases))
+            {
+                databases = GetDBFromJsonString(currentDatabases);
+            }
+
+            databases.Add(database);
+
+            //If there are more than 1 databases in the databases list that means there is already(at least) one database and the user is adding another one
+            if(databases.Count > 1)
+            {
+                //This loop checks each and every element in the databases and if it is a duplicate it returns 1, which indicates failure due to duplicate database
+                for (int i = 0; databases.Count - 1 > i; i++)
+                {
+                    if (DatabaseCheckEqual(databases[i], databases.Last()))
+                        return 1;
+                }
+            }
+
+            string data = Newtonsoft.Json.JsonConvert.SerializeObject(databases);
+            File.WriteAllText("Settings.txt", data);
+            return 0;
+        }
+
+        public bool DatabaseCheckEqual(Database database1, Database database2)
+        {
+            //The counter for how many equal items there are
+            int count = 0;
+
+            if (database1.DatabaseName == database2.DatabaseName)
+                count++;
+            if (database1.DatabaseIP == database2.DatabaseIP)
+                count++;
+            if (database1.DatabasePort == database2.DatabasePort)
+                count++;
+            if (database1.DatabasePW == database2.DatabasePW)
+                count++;
+            if (database1.DatabaseUname == database2.DatabaseUname)
+                count++;
+
+            //If all 5 items are equal, then they are 2 identical databases
+            if (count == 5)
+                return true;
             else
-                return ACSettings[index][1];
+                return false;
         }
 
-        private int GetIndex(List<List<string>> ACSetting, string Setting)
+        /// <summary>
+        /// Returns all the functional databases in the Settings.txt file. Returns a new List<Database> if none are found
+        /// </summary>
+        /// <returns>All functional databases in Settings.txt. Returns new List<Database> if none are found</returns>
+        public List<Database> GetFunctionalDatabases()
         {
-            for (int i = 0; ACSetting.Count > i; i++)
+            List<Database> databases = GetDatabases();
+            List<Database> CheckedDB = new List<Database>();
+            foreach(Database database in databases)
             {
-                if (ACSetting[i].Contains(Setting, StringComparer.OrdinalIgnoreCase))
-                    return i;
+                if (CheckDatabaseConnection(database))
+                    CheckedDB.Add(database);
             }
-            return -1;
+            return CheckedDB;
         }
 
-        public bool CheckDatabaseFromFile()
+        /// <summary>
+        /// Attemps to open a mysql connection with MysqlConnection, returns true if succsessful and false if failure.
+        /// </summary>
+        /// <param name="database">The database to test</param>
+        /// <returns></returns>
+        public bool CheckDatabaseConnection(Database database)
         {
-            ConfigurationManager manager = new ConfigurationManager();
-            List<List<string>> AllSettings = manager.GetAllSettings();
-
-            string DefaultDatabase = GetSetting("Default Database");
-            string DatabaseName = "";
-            string DatabaseIP = "";
-            string DatabaseUname = "";
-            string DatabasePW = "";
-            string DatabasePort = "";
-
-            foreach (List<string> ls in AllSettings)
-            {
-                if (ls[0].Equals("Database" + DefaultDatabase + " Name", StringComparison.CurrentCultureIgnoreCase))
-                    DatabaseName = ls[1];
-                else if (ls[0].Equals("Database" + DefaultDatabase + " IP", StringComparison.CurrentCultureIgnoreCase))
-                    DatabaseIP = ls[1];
-                else if (ls[0].Equals("Database" + DefaultDatabase + " Username", StringComparison.CurrentCultureIgnoreCase))
-                    DatabaseUname = ls[1];
-                else if (ls[0].Equals("Database" + DefaultDatabase + " Password", StringComparison.CurrentCultureIgnoreCase))
-                    DatabasePW = ls[1];
-                else if (ls[0].Equals("Database" + DefaultDatabase + " Port", StringComparison.CurrentCultureIgnoreCase))
-                    DatabasePort = ls[1];
-            }
-
-            MySqlConnection con = new MySqlConnection("Server=" + DatabaseIP + ";Database=" + DatabaseName + ";User Id=" + DatabaseUname + ";Password = " + DatabasePW + ";Port=" + DatabasePort + "; ");
+            MySqlConnection con = new MySqlConnection("Server=" + database.DatabaseIP + ";Port=" + database.DatabasePort + ";Database=" + database.DatabaseName + ";Uid=" +
+                "" + database.DatabaseUname + ";Pwd=" + database.DatabasePW + "; ");
             try
             {
                 con.Open();
