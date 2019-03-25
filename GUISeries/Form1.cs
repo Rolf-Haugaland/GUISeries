@@ -54,11 +54,14 @@ namespace GUISeries
 
         void StartupCheck()
         {
-            //Creates a settings file if it doesent already exist
+            //Creates the nessecary files and folders
             if (!Directory.Exists(StaticInfo.FolderPath))
                 Directory.CreateDirectory(StaticInfo.FolderPath);
-            if (!File.Exists(StaticInfo.path))
-                File.Create(StaticInfo.path).Close();
+            if (!File.Exists(StaticInfo.DatabaseConfPath))
+                File.Create(StaticInfo.DatabaseConfPath).Close();
+            if (!File.Exists(StaticInfo.SettingsPath))
+                File.Create(StaticInfo.SettingsPath);
+
             SetFunctionalDatabase();
         }
 
@@ -74,13 +77,14 @@ namespace GUISeries
 
         List<string> GetSerieNames()
         {
+            ConfigurationManager manager = new ConfigurationManager();
             if(string.IsNullOrWhiteSpace(StaticInfo.CurrentDatabase.DatabaseName))
                 return new List<string>();
 
             Database database = StaticInfo.CurrentDatabase;
-            MySqlConnection con = new MySqlConnection(StaticInfo.Connectionstring);
-            MySqlCommand cmd = new MySqlCommand("Select * from Series GROUP BY ShowName", con);
-
+            MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
+            MySqlCommand cmd = new MySqlCommand("Select ShowName from Series GROUP BY ShowName", con);
+            con.Open();
             List<string> showNames = new List<string>();
 
             MySqlDataReader reader = cmd.ExecuteReader();
@@ -88,14 +92,15 @@ namespace GUISeries
             {
                 showNames.Add(reader["ShowName"].ToString());
             }
-
+            con.Close();
             return showNames;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             StartupCheck();
-            UpdateTextBoxAutoComplete();
+            if(StaticInfo.CurrentDatabase != null)
+                UpdateTextBoxAutoComplete();
         }
 
         void UpdateTextBoxAutoComplete()
@@ -139,7 +144,11 @@ namespace GUISeries
                 MessageBox.Show("Vennligst bare velg en ting du vil laste opp");
                 return;
             }
-
+            if(lstView_SeriesFromAPI.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Vennligst velg en ting du vil laste opp");
+                return;
+            }
             AddSeries addSeries = new AddSeries();
             CLSerie serie = currentList.Find(x => x.name == lstView_SeriesFromAPI.SelectedItems[0].Name);
             addSeries.Initialize(serie);
@@ -161,6 +170,7 @@ namespace GUISeries
                 }
             }
         }
+
         public async Task<List<CLSerie>> GetSerie(string SearchQuery)
         {
 
@@ -205,6 +215,8 @@ namespace GUISeries
 
             CLSerie add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLSerie>(jObject.ToString());
 
+            add.linkToEpisodes = JSerie.SelectToken("relationships.episodes.links.related").ToString();
+
             return add;
         }
 
@@ -212,6 +224,7 @@ namespace GUISeries
         {
             List<CLSerie> Series = GetSerie(txt_Search.Text).GetAwaiter().GetResult();
             currentList = Series;
+            lstView_SeriesFromAPI.Items.Clear();
             foreach(CLSerie Serie in Series)
             {
                 lstView_SeriesFromAPI.Items.Add(Serie.name, Serie.name, Serie.name);
