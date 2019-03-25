@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using MySql.Data.MySqlClient;
 
 namespace GUISeries
 {
@@ -18,7 +19,6 @@ namespace GUISeries
         public Form1()
         {
             InitializeComponent();
-            StartupCheck();
         }
 
         List<CLSerie> currentList = new List<CLSerie>();
@@ -55,8 +55,10 @@ namespace GUISeries
         void StartupCheck()
         {
             //Creates a settings file if it doesent already exist
-            if (!File.Exists("Settings.txt"))
-                File.Create("Settings.txt").Close();
+            if (!Directory.Exists(StaticInfo.FolderPath))
+                Directory.CreateDirectory(StaticInfo.FolderPath);
+            if (!File.Exists(StaticInfo.path))
+                File.Create(StaticInfo.path).Close();
             SetFunctionalDatabase();
         }
 
@@ -72,11 +74,27 @@ namespace GUISeries
 
         List<string> GetSerieNames()
         {
-            return new List<string>();
+            if(string.IsNullOrWhiteSpace(StaticInfo.CurrentDatabase.DatabaseName))
+                return new List<string>();
+
+            Database database = StaticInfo.CurrentDatabase;
+            MySqlConnection con = new MySqlConnection(StaticInfo.Connectionstring);
+            MySqlCommand cmd = new MySqlCommand("Select * from Series GROUP BY ShowName", con);
+
+            List<string> showNames = new List<string>();
+
+            MySqlDataReader reader = cmd.ExecuteReader();
+            while(reader.Read())
+            {
+                showNames.Add(reader["ShowName"].ToString());
+            }
+
+            return showNames;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            StartupCheck();
             UpdateTextBoxAutoComplete();
         }
 
@@ -109,6 +127,13 @@ namespace GUISeries
 
 
             //This is needed incase the user tries to select multiple series and press ENTER, you can only upload one serie at a time. 
+
+            if (string.IsNullOrWhiteSpace(StaticInfo.CurrentDatabase.DatabaseName))
+            {
+                MessageBox.Show("There doesent seem to be a functional database configured. Please configure one and try again.");
+                return;
+            }
+
             if (lstView_SeriesFromAPI.SelectedItems.Count > 1)
             {
                 MessageBox.Show("Vennligst bare velg en ting du vil laste opp");
@@ -119,6 +144,22 @@ namespace GUISeries
             CLSerie serie = currentList.Find(x => x.name == lstView_SeriesFromAPI.SelectedItems[0].Name);
             addSeries.Initialize(serie);
             addSeries.Show();
+            ConfigurationManager manager = new ConfigurationManager();
+            List<Database> databases = manager.GetFunctionalDatabases();
+            if(databases.Count > 0)
+            {
+                Database database = databases.Find(x => x.DefaultDB == true);
+                if (!string.IsNullOrWhiteSpace(database.DatabaseUname))
+                {
+                    StaticInfo.CurrentDatabase = database;
+                    lbl_CurrentDatabase.Text = "Current database: " + database.DatabaseName;
+                }
+                else
+                {
+                    StaticInfo.CurrentDatabase = databases[0];
+                    lbl_CurrentDatabase.Text = "Current database " + databases[0].DatabaseName;
+                }
+            }
         }
         public async Task<List<CLSerie>> GetSerie(string SearchQuery)
         {
@@ -198,6 +239,12 @@ namespace GUISeries
         private void mnStrp_SetDB(object sender, EventArgs e)
         {
 
+        }
+
+        private void txt_Search_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                btn_ConfirmSearch.PerformClick();
         }
     }
 }

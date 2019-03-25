@@ -11,8 +11,10 @@ namespace GUISeries
     {
         public int LatestEpisode(string SerieName)
         {
+            Database database = StaticInfo.CurrentDatabase;
             MySqlCommand cmd = new MySqlCommand("Select * from Series where Name = '" + SerieName + "'");
-            MySqlConnection con = new MySqlConnection("Server=192.168.10.20;Database=GUISeries;User Id=root;Password=Perolsen1;Port=3000; ");
+            MySqlConnection con = new MySqlConnection("Server = " + database.DatabaseIP + "; Port = " + database.DatabasePort + "; Database = " + database.DatabaseName + 
+                "; Uid = " + database.DatabaseUname + ";Pwd = " + database.DatabasePW + ";");
             cmd.Connection = con;
             con.Open();
             MySqlDataReader reader = cmd.ExecuteReader();
@@ -31,7 +33,7 @@ namespace GUISeries
         /// <returns>All databases in the Settings.txt file, connectable or not</returns>
         public List<Database> GetDatabases()
         {
-            string allDatabases = File.ReadAllText("Settings.txt");
+            string allDatabases = File.ReadAllText(StaticInfo.path);
 
             if (!string.IsNullOrWhiteSpace(allDatabases))
             {
@@ -63,13 +65,13 @@ namespace GUISeries
         public void OverWriteDatabases(List<Database> databases)
         {
             string data = Newtonsoft.Json.JsonConvert.SerializeObject(databases);
-            File.WriteAllText("Settings.txt", data);
+            File.WriteAllText(StaticInfo.path, data);
         }
 
         public void RemoveDatabase(Database database)
         {
             List<Database> databases = new List<Database>();
-            string currentDatabases = File.ReadAllText("Settings.txt");
+            string currentDatabases = File.ReadAllText(StaticInfo.path);
             if (!string.IsNullOrWhiteSpace(currentDatabases))
                 databases = GetDBFromJsonString(currentDatabases);
             //Loops through all the databases to find the one to remove. Once it is found it removes it and stops the function.
@@ -89,7 +91,7 @@ namespace GUISeries
             //The list that will be written to the file
             List<Database> databases = new List<Database>();
 
-            string currentDatabases = File.ReadAllText("Settings.txt");
+            string currentDatabases = File.ReadAllText(StaticInfo.path);
             if (!string.IsNullOrWhiteSpace(currentDatabases))
             {
                 databases = GetDBFromJsonString(currentDatabases);
@@ -109,7 +111,7 @@ namespace GUISeries
             }
 
             string data = Newtonsoft.Json.JsonConvert.SerializeObject(databases);
-            File.WriteAllText("Settings.txt", data);
+            File.WriteAllText(StaticInfo.path, data);
             return 0;
         }
 
