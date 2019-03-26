@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace GUISeries
@@ -18,12 +19,30 @@ namespace GUISeries
             currentSerie = serie;
             ConfigurationManager manager = new ConfigurationManager();
             int currentEpisode = manager.LatestEpisode(serie.name) + 1;
-            txt_EpisodesWatched.Text = currentEpisode.ToString() + "-" + currentEpisode.ToString(); ;
+            if(currentEpisode != -1)
+                txt_EpisodesWatched.Text = currentEpisode.ToString() + "-" + currentEpisode.ToString();
         }
 
         void AddSerie(CLSerie serie)
         {
+            ConfigurationManager manager = new ConfigurationManager();
+            List<int> integers = GetTwoInts(txt_EpisodesWatched.Text);
+            List<CLEpisode> episodes = manager.GetEpisodes(serie, integers[0], integers[1]);
+        }
 
+        List<int> GetTwoInts(string integers)
+        {
+            List<int> TwoInts = new List<int>();
+            for(int i = 0; integers.Length > i; i++)
+            {
+                if(integers[i] == '-')
+                {
+                    TwoInts.Add(Convert.ToInt32(integers.Substring(0, i)));
+                    TwoInts.Add(Convert.ToInt32(integers.Substring(i + 1, integers.Length - i - 1)));
+                }
+            }
+
+            return TwoInts;
         }
 
         private void MenStrp_HelpClick(object sender, EventArgs e)
@@ -95,6 +114,11 @@ namespace GUISeries
                 txt_EpisodesWatched.Text = AddOne(txt_EpisodesWatched.Text);
             if (e.KeyCode == Keys.Down && !string.IsNullOrWhiteSpace(txt_EpisodesWatched.Text))
                 txt_EpisodesWatched.Text = RemoveOne(txt_EpisodesWatched.Text);
+        }
+
+        private void btn_Confirm_Click(object sender, EventArgs e)
+        {
+            AddSerie(currentSerie);
         }
     }
 }

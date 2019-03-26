@@ -34,6 +34,8 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txt_EpisodesWatched = new System.Windows.Forms.TextBox();
+            this.btn_Confirm = new System.Windows.Forms.Button();
+            this.prgrsBr_UploadProgress = new System.Windows.Forms.ProgressBar();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -41,7 +43,7 @@
             // 
             this.lbl_Heading.AutoSize = true;
             this.lbl_Heading.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
-            this.lbl_Heading.Location = new System.Drawing.Point(143, 32);
+            this.lbl_Heading.Location = new System.Drawing.Point(12, 45);
             this.lbl_Heading.Name = "lbl_Heading";
             this.lbl_Heading.Size = new System.Drawing.Size(474, 25);
             this.lbl_Heading.TabIndex = 0;
@@ -49,14 +51,15 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(85, 158);
+            this.textBox1.Location = new System.Drawing.Point(12, 161);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(147, 20);
             this.textBox1.TabIndex = 1;
+            this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_EpisodeWatched_KeyDown);
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(82, 129);
+            this.label2.Location = new System.Drawing.Point(9, 132);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(268, 26);
             this.label2.TabIndex = 2;
@@ -69,7 +72,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(800, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(586, 24);
             this.menuStrip1.TabIndex = 3;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -82,17 +85,37 @@
             // 
             // txt_EpisodesWatched
             // 
-            this.txt_EpisodesWatched.Location = new System.Drawing.Point(447, 158);
+            this.txt_EpisodesWatched.Location = new System.Drawing.Point(283, 161);
             this.txt_EpisodesWatched.Name = "txt_EpisodesWatched";
             this.txt_EpisodesWatched.Size = new System.Drawing.Size(147, 20);
             this.txt_EpisodesWatched.TabIndex = 4;
             this.txt_EpisodesWatched.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_EpisodeWatched_KeyDown);
             // 
+            // btn_Confirm
+            // 
+            this.btn_Confirm.Location = new System.Drawing.Point(189, 224);
+            this.btn_Confirm.Name = "btn_Confirm";
+            this.btn_Confirm.Size = new System.Drawing.Size(75, 23);
+            this.btn_Confirm.TabIndex = 5;
+            this.btn_Confirm.Text = "OK";
+            this.btn_Confirm.UseVisualStyleBackColor = true;
+            this.btn_Confirm.Click += new System.EventHandler(this.btn_Confirm_Click);
+            // 
+            // prgrsBr_UploadProgress
+            // 
+            this.prgrsBr_UploadProgress.Location = new System.Drawing.Point(77, 195);
+            this.prgrsBr_UploadProgress.Name = "prgrsBr_UploadProgress";
+            this.prgrsBr_UploadProgress.Size = new System.Drawing.Size(298, 23);
+            this.prgrsBr_UploadProgress.TabIndex = 6;
+            this.prgrsBr_UploadProgress.Visible = false;
+            // 
             // AddSeries
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(586, 276);
+            this.Controls.Add(this.prgrsBr_UploadProgress);
+            this.Controls.Add(this.btn_Confirm);
             this.Controls.Add(this.txt_EpisodesWatched);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox1);
@@ -117,5 +140,7 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.TextBox txt_EpisodesWatched;
+        private System.Windows.Forms.Button btn_Confirm;
+        private System.Windows.Forms.ProgressBar prgrsBr_UploadProgress;
     }
 }

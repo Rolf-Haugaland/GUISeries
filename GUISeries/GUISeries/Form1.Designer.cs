@@ -35,8 +35,8 @@
             this.configurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.configureChangeDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.lbl_CurrentDatabase = new System.Windows.Forms.Label();
             this.setDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lbl_CurrentDatabase = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -48,6 +48,7 @@
             this.txt_Search.Name = "txt_Search";
             this.txt_Search.Size = new System.Drawing.Size(237, 20);
             this.txt_Search.TabIndex = 0;
+            this.txt_Search.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_Search_KeyDown);
             // 
             // btn_ConfirmSearch
             // 
@@ -95,16 +96,23 @@
             // configureChangeDatabaseToolStripMenuItem
             // 
             this.configureChangeDatabaseToolStripMenuItem.Name = "configureChangeDatabaseToolStripMenuItem";
-            this.configureChangeDatabaseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.configureChangeDatabaseToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.configureChangeDatabaseToolStripMenuItem.Text = "Add database";
             this.configureChangeDatabaseToolStripMenuItem.Click += new System.EventHandler(this.MnStrp_ConfigureDB);
             // 
             // removeDatabaseToolStripMenuItem
             // 
             this.removeDatabaseToolStripMenuItem.Name = "removeDatabaseToolStripMenuItem";
-            this.removeDatabaseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.removeDatabaseToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.removeDatabaseToolStripMenuItem.Text = "Remove database";
             this.removeDatabaseToolStripMenuItem.Click += new System.EventHandler(this.MnStrp_RemoveDB);
+            // 
+            // setDatabaseToolStripMenuItem
+            // 
+            this.setDatabaseToolStripMenuItem.Name = "setDatabaseToolStripMenuItem";
+            this.setDatabaseToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.setDatabaseToolStripMenuItem.Text = "Set database";
+            this.setDatabaseToolStripMenuItem.Click += new System.EventHandler(this.mnStrp_SetDB);
             // 
             // lbl_CurrentDatabase
             // 
@@ -115,13 +123,6 @@
             this.lbl_CurrentDatabase.Size = new System.Drawing.Size(118, 17);
             this.lbl_CurrentDatabase.TabIndex = 4;
             this.lbl_CurrentDatabase.Text = "Current datbase: ";
-            // 
-            // setDatabaseToolStripMenuItem
-            // 
-            this.setDatabaseToolStripMenuItem.Name = "setDatabaseToolStripMenuItem";
-            this.setDatabaseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.setDatabaseToolStripMenuItem.Text = "Set database";
-            this.setDatabaseToolStripMenuItem.Click += new System.EventHandler(this.mnStrp_SetDB);
             // 
             // Form1
             // 

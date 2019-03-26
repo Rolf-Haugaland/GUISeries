@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using MySql.Data.MySqlClient;
 
 namespace GUISeries
 {
@@ -18,7 +19,6 @@ namespace GUISeries
         public Form1()
         {
             InitializeComponent();
-            StartupCheck();
         }
 
         List<CLSerie> currentList = new List<CLSerie>();
@@ -54,9 +54,14 @@ namespace GUISeries
 
         void StartupCheck()
         {
-            //Creates a settings file if it doesent already exist
-            if (!File.Exists("Settings.txt"))
-                File.Create("Settings.txt").Close();
+            //Creates the nessecary files and folders
+            if (!Directory.Exists(StaticInfo.FolderPath))
+                Directory.CreateDirectory(StaticInfo.FolderPath);
+            if (!File.Exists(StaticInfo.DatabaseConfPath))
+                File.Create(StaticInfo.DatabaseConfPath).Close();
+            if (!File.Exists(StaticInfo.SettingsPath))
+                File.Create(StaticInfo.SettingsPath);
+
             SetFunctionalDatabase();
         }
 
@@ -72,12 +77,30 @@ namespace GUISeries
 
         List<string> GetSerieNames()
         {
-            return new List<string>();
+            ConfigurationManager manager = new ConfigurationManager();
+            if(string.IsNullOrWhiteSpace(StaticInfo.CurrentDatabase.DatabaseName))
+                return new List<string>();
+
+            Database database = StaticInfo.CurrentDatabase;
+            MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
+            MySqlCommand cmd = new MySqlCommand("Select ShowName from Series GROUP BY ShowName", con);
+            con.Open();
+            List<string> showNames = new List<string>();
+
+            MySqlDataReader reader = cmd.ExecuteReader();
+            while(reader.Read())
+            {
+                showNames.Add(reader["ShowName"].ToString());
+            }
+            con.Close();
+            return showNames;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            UpdateTextBoxAutoComplete();
+            StartupCheck();
+            if(StaticInfo.CurrentDatabase != null)
+                UpdateTextBoxAutoComplete();
         }
 
         void UpdateTextBoxAutoComplete()
@@ -109,17 +132,45 @@ namespace GUISeries
 
 
             //This is needed incase the user tries to select multiple series and press ENTER, you can only upload one serie at a time. 
+
+            if (string.IsNullOrWhiteSpace(StaticInfo.CurrentDatabase.DatabaseName))
+            {
+                MessageBox.Show("There doesent seem to be a functional database configured. Please configure one and try again.");
+                return;
+            }
+
             if (lstView_SeriesFromAPI.SelectedItems.Count > 1)
             {
                 MessageBox.Show("Vennligst bare velg en ting du vil laste opp");
                 return;
             }
-
+            if(lstView_SeriesFromAPI.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Vennligst velg en ting du vil laste opp");
+                return;
+            }
             AddSeries addSeries = new AddSeries();
             CLSerie serie = currentList.Find(x => x.name == lstView_SeriesFromAPI.SelectedItems[0].Name);
             addSeries.Initialize(serie);
             addSeries.Show();
+            ConfigurationManager manager = new ConfigurationManager();
+            List<Database> databases = manager.GetFunctionalDatabases();
+            if(databases.Count > 0)
+            {
+                Database database = databases.Find(x => x.DefaultDB == true);
+                if (!string.IsNullOrWhiteSpace(database.DatabaseUname))
+                {
+                    StaticInfo.CurrentDatabase = database;
+                    lbl_CurrentDatabase.Text = "Current database: " + database.DatabaseName;
+                }
+                else
+                {
+                    StaticInfo.CurrentDatabase = databases[0];
+                    lbl_CurrentDatabase.Text = "Current database " + databases[0].DatabaseName;
+                }
+            }
         }
+
         public async Task<List<CLSerie>> GetSerie(string SearchQuery)
         {
 
@@ -164,6 +215,8 @@ namespace GUISeries
 
             CLSerie add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLSerie>(jObject.ToString());
 
+            add.linkToEpisodes = JSerie.SelectToken("relationships.episodes.links.related").ToString();
+
             return add;
         }
 
@@ -171,6 +224,7 @@ namespace GUISeries
         {
             List<CLSerie> Series = GetSerie(txt_Search.Text).GetAwaiter().GetResult();
             currentList = Series;
+            lstView_SeriesFromAPI.Items.Clear();
             foreach(CLSerie Serie in Series)
             {
                 lstView_SeriesFromAPI.Items.Add(Serie.name, Serie.name, Serie.name);
@@ -198,6 +252,12 @@ namespace GUISeries
         private void mnStrp_SetDB(object sender, EventArgs e)
         {
 
+        }
+
+        private void txt_Search_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                btn_ConfirmSearch.PerformClick();
         }
     }
 }

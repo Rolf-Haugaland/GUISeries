@@ -4,15 +4,26 @@ using System.Linq;
 using System.IO;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace GUISeries
 {
     class ConfigurationManager
     {
+        /// <summary>
+        /// Searches the database for the serie name provided. Returns an integer that is the highest number episode watched. 
+        /// Example: i have added episode 1-5 of naruto. This method gets 'naruto' as SerieName and returns 5 since its the highest 
+        /// episode number. Returns -1 if the database holds no record of the show
+        /// </summary>
+        /// <param name="SerieName">The name of the series to return the highest episode number of</param>
+        /// <returns></returns>
         public int LatestEpisode(string SerieName)
         {
+            Database database = StaticInfo.CurrentDatabase;
             MySqlCommand cmd = new MySqlCommand("Select * from Series where Name = '" + SerieName + "'");
-            MySqlConnection con = new MySqlConnection("Server=192.168.10.20;Database=GUISeries;User Id=root;Password=Perolsen1;Port=3000; ");
+            MySqlConnection con = new MySqlConnection("Server = " + database.DatabaseIP + "; Port = " + database.DatabasePort + "; Database = " + database.DatabaseName + 
+                "; Uid = " + database.DatabaseUname + ";Pwd = " + database.DatabasePW + ";");
             cmd.Connection = con;
             con.Open();
             MySqlDataReader reader = cmd.ExecuteReader();
@@ -21,8 +32,10 @@ namespace GUISeries
             {
                Episodes.Add(Convert.ToInt16(reader["EpisodeNumber"]));
             }
-
-            return Episodes.Max();
+            if (Episodes.Count != 0)
+                return Episodes.Max();
+            else
+                return -1;
         }
 
         /// <summary>
@@ -31,7 +44,7 @@ namespace GUISeries
         /// <returns>All databases in the Settings.txt file, connectable or not</returns>
         public List<Database> GetDatabases()
         {
-            string allDatabases = File.ReadAllText("Settings.txt");
+            string allDatabases = File.ReadAllText(StaticInfo.DatabaseConfPath);
 
             if (!string.IsNullOrWhiteSpace(allDatabases))
             {
@@ -39,6 +52,79 @@ namespace GUISeries
             }
 
             return new List<Database>();
+        }
+
+        public List<CLEpisode> GetEpisodes(CLSerie serie, int startEpisode, int endEpisode)
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.api+json"));
+            List<CLEpisode> CLEpisodes = new List<CLEpisode>();
+            int Episodes = AmountBetweenNumbers(startEpisode, endEpisode);
+            int RunXTimes = AmountOfTimes(Episodes);
+            int offset;
+            if (startEpisode == 0)
+                offset = 0;
+            else
+                offset = startEpisode - 1;
+            for (int i = 0; RunXTimes > i; i++)
+            {
+                int Limitint = LowerIntTo20(endEpisode - startEpisode);
+                using (HttpResponseMessage response = client.GetAsync(serie.linkToEpisodes + "?&[page]offset=" + offset + "&[page]limit=" + Limitint.ToString()).Result)
+                {
+                    offset += Limitint;//MIGHT WORK MIGHT NOT. TRY AND FIND OUT
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Task<string> jsonString = response.Content.ReadAsStringAsync();
+                        string ree = jsonString.Result;
+                        JToken allEpisodesToken = JObject.Parse(ree).SelectToken("data");
+                        JArray AllEpisodesJArray = (JArray)allEpisodesToken;
+                        foreach (JObject episode in AllEpisodesJArray)
+                        {
+                            JToken jTokenEpisode = episode.SelectToken("attributes");
+                            JObject jObjectEpisode = (JObject)jTokenEpisode;
+                            CLEpisode add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLEpisode>(jObjectEpisode.ToString());
+                            add.showName = serie.name;
+                            CLEpisodes.Add(add);
+                        }
+                    }
+                }
+            }
+            return new List<CLEpisode>();
+        }
+
+        int AmountBetweenNumbers(int one, int two)
+        {
+            if (one != 0)
+                return (two - one) + 1;
+            else
+                return two - one;
+        }
+
+        int AmountOfTimes(int runs)
+        {
+            if (runs < 20)
+            {
+                return 1;
+            }
+            else if (runs > 20)
+            {
+                for (int i = 0; runs > i; i++)
+                {
+                    runs -= 20;
+                    if (runs <= 0)
+                        return i;
+                }
+            }
+
+            return -1;
+        }
+
+        int LowerIntTo20(int i)
+        {
+            if (i > 20)
+                return 20;
+            else
+                return i;
         }
 
         private List<Database> GetDBFromJsonString(string JsonString)
@@ -63,13 +149,13 @@ namespace GUISeries
         public void OverWriteDatabases(List<Database> databases)
         {
             string data = Newtonsoft.Json.JsonConvert.SerializeObject(databases);
-            File.WriteAllText("Settings.txt", data);
+            File.WriteAllText(StaticInfo.DatabaseConfPath, data);
         }
 
         public void RemoveDatabase(Database database)
         {
             List<Database> databases = new List<Database>();
-            string currentDatabases = File.ReadAllText("Settings.txt");
+            string currentDatabases = File.ReadAllText(StaticInfo.DatabaseConfPath);
             if (!string.IsNullOrWhiteSpace(currentDatabases))
                 databases = GetDBFromJsonString(currentDatabases);
             //Loops through all the databases to find the one to remove. Once it is found it removes it and stops the function.
@@ -89,7 +175,7 @@ namespace GUISeries
             //The list that will be written to the file
             List<Database> databases = new List<Database>();
 
-            string currentDatabases = File.ReadAllText("Settings.txt");
+            string currentDatabases = File.ReadAllText(StaticInfo.DatabaseConfPath);
             if (!string.IsNullOrWhiteSpace(currentDatabases))
             {
                 databases = GetDBFromJsonString(currentDatabases);
@@ -109,7 +195,7 @@ namespace GUISeries
             }
 
             string data = Newtonsoft.Json.JsonConvert.SerializeObject(databases);
-            File.WriteAllText("Settings.txt", data);
+            File.WriteAllText(StaticInfo.DatabaseConfPath, data);
             return 0;
         }
 
@@ -172,6 +258,15 @@ namespace GUISeries
                 con.Close();
                 return false;
             }
+        }
+
+        public string GetConnectionstring()
+        {
+            if (StaticInfo.CurrentDatabase != null)
+                return "Server=" + StaticInfo.CurrentDatabase.DatabaseIP + ";Port=" + StaticInfo.CurrentDatabase.DatabasePort + ";Database=" + StaticInfo.CurrentDatabase.DatabaseName + ";Uid=" +
+                "" + StaticInfo.CurrentDatabase.DatabaseUname + ";Pwd=" + StaticInfo.CurrentDatabase.DatabasePW + ";";
+            else
+                return "";
         }
     }
 }
