@@ -59,6 +59,7 @@ namespace GUISeries
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.api+json"));
             List<CLEpisode> CLEpisodes = new List<CLEpisode>();
+<<<<<<< HEAD:GUISeries/GUISeries/ConfigurationManager.cs
             int Episodes = AmountBetweenNumbers(startEpisode, endEpisode);
             int RunXTimes = AmountOfTimes(Episodes);
             int offset;
@@ -85,10 +86,33 @@ namespace GUISeries
                             CLEpisode add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLEpisode>(jObjectEpisode.ToString());
                             add.showName = serie.name;
                             CLEpisodes.Add(add);
+=======
+            if(endEpisode - startEpisode > 20)
+            {
+                for (int i = startEpisode; endEpisode - startEpisode > i; i += 20)
+                {
+                    using (HttpResponseMessage response = client.GetAsync(serie.linkToEpisodes + "?&[page]offset=" + i + "&[page]limit=" + LowerIntTo20(endEpisode - i).ToString()).Result)
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            Task<string> jsonString = response.Content.ReadAsStringAsync();
+                            string ree = jsonString.Result;
+                            JToken allEpisodesToken = JObject.Parse(ree).SelectToken("data");
+                            JArray AllEpisodesJArray = (JArray)allEpisodesToken;
+                            foreach (JObject episode in AllEpisodesJArray)
+                            {
+                                JToken jTokenEpisode = episode.SelectToken("attributes");
+                                JObject jObjectEpisode = (JObject)jTokenEpisode;
+                                CLEpisode add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLEpisode>(jObjectEpisode.ToString());
+                                add.showName = serie.name;
+                                CLEpisodes.Add(add);
+                            }
+>>>>>>> 7677029dd112041ed7ec998c9e35c6ef4fe9ef49:GUISeries/ConfigurationManager.cs
                         }
                     }
                 }
             }
+<<<<<<< HEAD:GUISeries/GUISeries/ConfigurationManager.cs
             return new List<CLEpisode>();
         }
 
@@ -117,6 +141,13 @@ namespace GUISeries
             }
 
             return -1;
+=======
+            else
+            {
+
+            }
+            return new List<CLEpisode>();
+>>>>>>> 7677029dd112041ed7ec998c9e35c6ef4fe9ef49:GUISeries/ConfigurationManager.cs
         }
 
         int LowerIntTo20(int i)

@@ -27,7 +27,11 @@ namespace GUISeries
         {
             ConfigurationManager manager = new ConfigurationManager();
             List<int> integers = GetTwoInts(txt_EpisodesWatched.Text);
+<<<<<<< HEAD:GUISeries/GUISeries/AddSeries.cs
             List<CLEpisode> episodes = manager.GetEpisodes(serie, integers[0], integers[1]);
+=======
+            List<CLEpisode> episodes = manager.GetEpisodes(serie, integers[0], integers[1]).GetAwaiter().GetResult();
+>>>>>>> 7677029dd112041ed7ec998c9e35c6ef4fe9ef49:GUISeries/AddSeries.cs
         }
 
         List<int> GetTwoInts(string integers)
