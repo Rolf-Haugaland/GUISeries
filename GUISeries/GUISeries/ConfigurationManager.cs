@@ -6,6 +6,7 @@ using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace GUISeries
 {
@@ -21,7 +22,7 @@ namespace GUISeries
         public int LatestEpisode(string SerieName)
         {
             Database database = StaticInfo.CurrentDatabase;
-            MySqlCommand cmd = new MySqlCommand("Select * from Series where Name = '" + SerieName + "'");
+            MySqlCommand cmd = new MySqlCommand("Select * from Series where ShowName = '" + SerieName + "'");
             MySqlConnection con = new MySqlConnection("Server = " + database.DatabaseIP + "; Port = " + database.DatabasePort + "; Database = " + database.DatabaseName + 
                 "; Uid = " + database.DatabaseUname + ";Pwd = " + database.DatabasePW + ";");
             cmd.Connection = con;
@@ -54,12 +55,110 @@ namespace GUISeries
             return new List<Database>();
         }
 
+        public void UploadEpisodes(List<CLEpisode> episodes, CLSerie serie, DateTime timestamp)
+        {
+            CultureInfo info = CultureInfo.CreateSpecificCulture("nb-NO");
+            MySqlConnection con = new MySqlConnection(GetConnectionstring());
+            MySqlCommand cmd = new MySqlCommand();
+            string SQL = "Insert into Series(Name,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,Length,EpisodeNumber,SeasonNumber,ShowName,TimeStamp) VALUES(";
+            int i = 0;
+            int count = 1;
+            foreach (CLEpisode episode in episodes)
+            {
+                i++;
+                if(count == episodes.Count)
+                {
+                    SQL += "@Name" + i.ToString() + ",@EpisodeCount" + i.ToString() + ",@AgeRating" + i.ToString() + ",@NSFW" + i.ToString() + ",@Synopsis" +
+    i.ToString() + ",@TotalShowLength" + i.ToString() + ",@Length" + i.ToString() + ",@EpisodeNumber" + i.ToString() + ",@SeasonNumber" +
+    i.ToString() + ",@ShowName" + i.ToString() + ",@TimeStamp" + i.ToString() + ")";
+                }
+                else
+                {
+                    SQL += "@Name" + i.ToString() + ",@EpisodeCount" + i.ToString() + ",@AgeRating" + i.ToString() + ",@NSFW" + i.ToString() + ",@Synopsis" +
+    i.ToString() + ",@TotalShowLength" + i.ToString() + ",@Length" + i.ToString() + ",@EpisodeNumber" + i.ToString() + ",@SeasonNumber" +
+    i.ToString() + ",@ShowName" + i.ToString() + ",@TimeStamp" + i.ToString() + "),(";
+                }
+                MySqlParameter parName = new MySqlParameter()
+                {
+                    ParameterName = "@Name" + i.ToString(),
+                    Value = episode.name
+                };
+                cmd.Parameters.Add(parName);
+                MySqlParameter parEpisodeCount = new MySqlParameter()
+                {
+                    ParameterName = "@EpisodeCount" + i.ToString(),
+                    Value = serie.episodeCount
+                };
+                cmd.Parameters.Add(parEpisodeCount);
+                MySqlParameter parAgeRating = new MySqlParameter()
+                {
+                    ParameterName = "@AgeRating" + i.ToString(),
+                    Value = serie.ageRating
+                };
+                cmd.Parameters.Add(parAgeRating);
+                MySqlParameter parNSFW = new MySqlParameter()
+                {
+                    ParameterName = "@NSFW" + i.ToString(),
+                    Value = serie.NSFW
+                };
+                cmd.Parameters.Add(parNSFW);
+                MySqlParameter parSynopsis = new MySqlParameter()
+                {
+                    ParameterName = "@Synopsis" + i.ToString(),
+                    Value = episode.synopsis
+                };
+                cmd.Parameters.Add(parSynopsis);
+                MySqlParameter parTotalShowLength = new MySqlParameter()
+                {
+                    ParameterName = "@TotalShowLength" + i.ToString(),
+                    Value = serie.totalLength
+                };
+                cmd.Parameters.Add(parTotalShowLength);
+                MySqlParameter parLength = new MySqlParameter()
+                {
+                    ParameterName = "@Length" + i.ToString(),
+                    Value = episode.length
+                };
+                cmd.Parameters.Add(parLength);
+                MySqlParameter parEpisodeNumber = new MySqlParameter()
+                {
+                    ParameterName = "@EpisodeNumber" + i.ToString(),
+                    Value = episode.EpisodeNumber
+                };
+                cmd.Parameters.Add(parEpisodeNumber);
+                MySqlParameter parSeasonNumber = new MySqlParameter()
+                {
+                    ParameterName = "@SeasonNumber" + i.ToString(),
+                    Value = episode.seasonNumber
+                };
+                cmd.Parameters.Add(parSeasonNumber);
+                MySqlParameter parShowName = new MySqlParameter()
+                {
+                    ParameterName = "@ShowName" + i.ToString(),
+                    Value = serie.name
+                };
+                cmd.Parameters.Add(parShowName);
+                MySqlParameter parTimeStamp = new MySqlParameter()
+                {
+                    ParameterName = "@TimeStamp" + i.ToString(),
+                    Value = timestamp
+                };
+                cmd.Parameters.Add(parTimeStamp);
+                count++;
+            }
+            cmd.Connection = con;
+            cmd.CommandText = SQL;
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+
+        }
+
         public List<CLEpisode> GetEpisodes(CLSerie serie, int startEpisode, int endEpisode)
         {
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.api+json"));
             List<CLEpisode> CLEpisodes = new List<CLEpisode>();
-<<<<<<< HEAD:GUISeries/GUISeries/ConfigurationManager.cs
             int Episodes = AmountBetweenNumbers(startEpisode, endEpisode);
             int RunXTimes = AmountOfTimes(Episodes);
             int offset;
@@ -67,12 +166,15 @@ namespace GUISeries
                 offset = 0;
             else
                 offset = startEpisode - 1;
+
             for (int i = 0; RunXTimes > i; i++)
-            {
-                int Limitint = LowerIntTo20(endEpisode - startEpisode);
+            {//There are a bunch of integers going up and down, look into it and figure it out if nessecary. That will be just as hard as me trying to explain wtf is 
+                //going on.
+                int Limitint = LowerIntTo20(Episodes);
+                Episodes -= Limitint;
                 using (HttpResponseMessage response = client.GetAsync(serie.linkToEpisodes + "?&[page]offset=" + offset + "&[page]limit=" + Limitint.ToString()).Result)
                 {
-                    offset += Limitint;//MIGHT WORK MIGHT NOT. TRY AND FIND OUT
+                    offset += Limitint;
                     if (response.IsSuccessStatusCode)
                     {
                         Task<string> jsonString = response.Content.ReadAsStringAsync();
@@ -86,34 +188,11 @@ namespace GUISeries
                             CLEpisode add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLEpisode>(jObjectEpisode.ToString());
                             add.showName = serie.name;
                             CLEpisodes.Add(add);
-=======
-            if(endEpisode - startEpisode > 20)
-            {
-                for (int i = startEpisode; endEpisode - startEpisode > i; i += 20)
-                {
-                    using (HttpResponseMessage response = client.GetAsync(serie.linkToEpisodes + "?&[page]offset=" + i + "&[page]limit=" + LowerIntTo20(endEpisode - i).ToString()).Result)
-                    {
-                        if (response.IsSuccessStatusCode)
-                        {
-                            Task<string> jsonString = response.Content.ReadAsStringAsync();
-                            string ree = jsonString.Result;
-                            JToken allEpisodesToken = JObject.Parse(ree).SelectToken("data");
-                            JArray AllEpisodesJArray = (JArray)allEpisodesToken;
-                            foreach (JObject episode in AllEpisodesJArray)
-                            {
-                                JToken jTokenEpisode = episode.SelectToken("attributes");
-                                JObject jObjectEpisode = (JObject)jTokenEpisode;
-                                CLEpisode add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLEpisode>(jObjectEpisode.ToString());
-                                add.showName = serie.name;
-                                CLEpisodes.Add(add);
-                            }
->>>>>>> 7677029dd112041ed7ec998c9e35c6ef4fe9ef49:GUISeries/ConfigurationManager.cs
                         }
                     }
                 }
             }
-<<<<<<< HEAD:GUISeries/GUISeries/ConfigurationManager.cs
-            return new List<CLEpisode>();
+            return CLEpisodes;
         }
 
         int AmountBetweenNumbers(int one, int two)
@@ -124,30 +203,37 @@ namespace GUISeries
                 return two - one;
         }
 
+        int AmountBetweenNumbersMax20(int one, int two)
+        {
+            int ToReturn = 0;
+            if (one != 0)
+                ToReturn = (two - one) + 1;
+            else
+                ToReturn = two - one;
+            if (ToReturn > 20)
+                return 20;
+            else
+                return ToReturn;
+        }
+
         int AmountOfTimes(int runs)
         {
+            int CheckInt = runs;
             if (runs < 20)
             {
                 return 1;
             }
             else if (runs > 20)
             {
-                for (int i = 0; runs > i; i++)
+                for (int i = 0; CheckInt > i; i++)
                 {
                     runs -= 20;
                     if (runs <= 0)
-                        return i;
+                        return i + 1;
                 }
             }
 
             return -1;
-=======
-            else
-            {
-
-            }
-            return new List<CLEpisode>();
->>>>>>> 7677029dd112041ed7ec998c9e35c6ef4fe9ef49:GUISeries/ConfigurationManager.cs
         }
 
         int LowerIntTo20(int i)

@@ -29,13 +29,14 @@
         private void InitializeComponent()
         {
             this.lbl_Heading = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txt_TimeStamp = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txt_EpisodesWatched = new System.Windows.Forms.TextBox();
             this.btn_Confirm = new System.Windows.Forms.Button();
             this.prgrsBr_UploadProgress = new System.Windows.Forms.ProgressBar();
+            this.lbl_TimeStamp = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,13 +50,14 @@
             this.lbl_Heading.TabIndex = 0;
             this.lbl_Heading.Text = "\"Name of series\", which episodes have you watched?";
             // 
-            // textBox1
+            // txt_TimeStamp
             // 
-            this.textBox1.Location = new System.Drawing.Point(12, 161);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(147, 20);
-            this.textBox1.TabIndex = 1;
-            this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_EpisodeWatched_KeyDown);
+            this.txt_TimeStamp.Location = new System.Drawing.Point(12, 161);
+            this.txt_TimeStamp.Name = "txt_TimeStamp";
+            this.txt_TimeStamp.Size = new System.Drawing.Size(147, 20);
+            this.txt_TimeStamp.TabIndex = 1;
+            this.txt_TimeStamp.TextChanged += new System.EventHandler(this.txt_TimeStamp_TextChanged);
+            this.txt_TimeStamp.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_EpisodeWatched_KeyDown);
             // 
             // label2
             // 
@@ -109,16 +111,25 @@
             this.prgrsBr_UploadProgress.TabIndex = 6;
             this.prgrsBr_UploadProgress.Visible = false;
             // 
+            // lbl_TimeStamp
+            // 
+            this.lbl_TimeStamp.AutoSize = true;
+            this.lbl_TimeStamp.Location = new System.Drawing.Point(14, 184);
+            this.lbl_TimeStamp.Name = "lbl_TimeStamp";
+            this.lbl_TimeStamp.Size = new System.Drawing.Size(0, 13);
+            this.lbl_TimeStamp.TabIndex = 7;
+            // 
             // AddSeries
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(586, 276);
+            this.Controls.Add(this.lbl_TimeStamp);
             this.Controls.Add(this.prgrsBr_UploadProgress);
             this.Controls.Add(this.btn_Confirm);
             this.Controls.Add(this.txt_EpisodesWatched);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txt_TimeStamp);
             this.Controls.Add(this.lbl_Heading);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -135,12 +146,13 @@
         #endregion
 
         private System.Windows.Forms.Label lbl_Heading;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txt_TimeStamp;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.TextBox txt_EpisodesWatched;
         private System.Windows.Forms.Button btn_Confirm;
         private System.Windows.Forms.ProgressBar prgrsBr_UploadProgress;
+        private System.Windows.Forms.Label lbl_TimeStamp;
     }
 }

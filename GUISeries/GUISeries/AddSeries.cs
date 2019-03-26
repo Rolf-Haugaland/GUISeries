@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace GUISeries
@@ -25,13 +26,19 @@ namespace GUISeries
 
         void AddSerie(CLSerie serie)
         {
+            //Get the datetime from textbox
             ConfigurationManager manager = new ConfigurationManager();
             List<int> integers = GetTwoInts(txt_EpisodesWatched.Text);
-<<<<<<< HEAD:GUISeries/GUISeries/AddSeries.cs
             List<CLEpisode> episodes = manager.GetEpisodes(serie, integers[0], integers[1]);
-=======
-            List<CLEpisode> episodes = manager.GetEpisodes(serie, integers[0], integers[1]).GetAwaiter().GetResult();
->>>>>>> 7677029dd112041ed7ec998c9e35c6ef4fe9ef49:GUISeries/AddSeries.cs
+            CultureInfo info = new CultureInfo("nb-NO");
+            if (DateTime.TryParse(txt_TimeStamp.Text, info, DateTimeStyles.None, out DateTime result))
+            {
+                manager.UploadEpisodes(episodes, serie, result);
+            }
+            else
+            {
+                manager.UploadEpisodes(episodes, serie, DateTime.Now);
+            }
         }
 
         List<int> GetTwoInts(string integers)
@@ -123,6 +130,24 @@ namespace GUISeries
         private void btn_Confirm_Click(object sender, EventArgs e)
         {
             AddSerie(currentSerie);
+        }
+
+        private void txt_TimeStamp_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                CultureInfo info = new CultureInfo("nb-NO");
+                DateTime TimeStamp = DateTime.Parse(txt_TimeStamp.Text, info);
+                string Month = TimeStamp.Month.ToString();
+                if (Month.Length == 1)
+                    Month = "0" + Month;
+                lbl_TimeStamp.Text = "Date: " + TimeStamp.Day + ", Month: " + Month + Environment.NewLine + "Year: " + TimeStamp.Year + ", Hour: " + TimeStamp.Hour
+                    + ", Minute: " + TimeStamp.Minute;
+            }
+            catch
+            {
+                lbl_TimeStamp.Text = "No date detected" + Environment.NewLine + "Example: 1.1.2001 23:59";
+            }
         }
     }
 }

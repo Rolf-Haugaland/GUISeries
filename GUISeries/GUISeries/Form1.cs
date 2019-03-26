@@ -152,7 +152,7 @@ namespace GUISeries
             AddSeries addSeries = new AddSeries();
             CLSerie serie = currentList.Find(x => x.name == lstView_SeriesFromAPI.SelectedItems[0].Name);
             addSeries.Initialize(serie);
-            addSeries.Show();
+            addSeries.ShowDialog();
             ConfigurationManager manager = new ConfigurationManager();
             List<Database> databases = manager.GetFunctionalDatabases();
             if(databases.Count > 0)
@@ -228,6 +228,11 @@ namespace GUISeries
             foreach(CLSerie Serie in Series)
             {
                 lstView_SeriesFromAPI.Items.Add(Serie.name, Serie.name, Serie.name);
+            }
+            if(lstView_SeriesFromAPI.Items.Count > 0)
+            {
+                lstView_SeriesFromAPI.Focus();
+                lstView_SeriesFromAPI.Items[0].Selected = true;
             }
         }
 
