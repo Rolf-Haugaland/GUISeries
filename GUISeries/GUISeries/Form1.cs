@@ -96,6 +96,21 @@ namespace GUISeries
             return showNames;
         }
 
+        void SetFunctionalDatabaseNoPrompt()
+        {
+            ConfigurationManager manager = new ConfigurationManager();
+            List<Database> databases = manager.GetFunctionalDatabases();
+            if(databases.Count == 0)
+            {
+                lbl_CurrentDatabase.Text = "Current database: No functional database found";
+            }
+            else
+            {
+                StaticInfo.CurrentDatabase = databases[0];
+                lbl_CurrentDatabase.Text = "Current database: " + StaticInfo.CurrentDatabase.DatabaseName;
+            }
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             StartupCheck();
@@ -171,7 +186,7 @@ namespace GUISeries
             }
         }
 
-        public async Task<List<CLSerie>> GetSerie(string SearchQuery)
+        public List<CLSerie> GetSerie(string SearchQuery)
         {
 
             HttpClient client = new HttpClient();
@@ -183,8 +198,8 @@ namespace GUISeries
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    var x = await response.Content.ReadAsStringAsync();
-                    JObject y = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(x);
+                    var x = response.Content.ReadAsStringAsync();
+                    JObject y = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(x.Result);
                     var FirstSerie = y.Children().Children().Children().ToArray();
                     foreach(JToken child in FirstSerie)
                     {
@@ -222,7 +237,7 @@ namespace GUISeries
 
         private void btn_ConfirmSearch_Click(object sender, EventArgs e)
         {
-            List<CLSerie> Series = GetSerie(txt_Search.Text).GetAwaiter().GetResult();
+            List<CLSerie> Series = GetSerie(txt_Search.Text);
             currentList = Series;
             lstView_SeriesFromAPI.Items.Clear();
             foreach(CLSerie Serie in Series)
@@ -240,23 +255,20 @@ namespace GUISeries
         {
             AddDatabase databaseConfiguration = new AddDatabase();
             databaseConfiguration.ShowDialog();
+            SetFunctionalDatabaseNoPrompt();
         }
 
         private void MnStrp_RemoveDB(object sender, EventArgs e)
         {
             RemoveDatabase rmdb = new RemoveDatabase();
             rmdb.ShowDialog();
-            ConfigurationManager manager = new ConfigurationManager();
-            List<Database> databases = manager.GetFunctionalDatabases();
-            if(databases.Count == 0)
-            {
-                lbl_CurrentDatabase.Text = "Current database: No functional database found";
-            }
+            SetFunctionalDatabaseNoPrompt();
         }
 
         private void mnStrp_SetDB(object sender, EventArgs e)
         {
-
+            //When you fix this and let them set a database then remove the comment from SetFunctionalDatabaseNoPrompt();
+            //SetFunctionalDatabaseNoPrompt();
         }
 
         private void txt_Search_KeyDown(object sender, KeyEventArgs e)
