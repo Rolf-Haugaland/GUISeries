@@ -149,5 +149,10 @@ namespace GUISeries
                 lbl_TimeStamp.Text = "No date detected" + Environment.NewLine + "Example: 1.1.2001 23:59";
             }
         }
+
+        private void AddSeries_Load(object sender, EventArgs e)
+        {
+            ActiveControl = btn_Confirm;
+        }
     }
 }

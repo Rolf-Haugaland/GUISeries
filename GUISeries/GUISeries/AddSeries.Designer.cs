@@ -135,6 +135,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "AddSeries";
             this.Text = "AddSeries";
+            this.Load += new System.EventHandler(this.AddSeries_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Frm_KeyDown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
