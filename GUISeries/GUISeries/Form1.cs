@@ -260,15 +260,20 @@ namespace GUISeries
 
         private void MnStrp_RemoveDB(object sender, EventArgs e)
         {
-            RemoveDatabase rmdb = new RemoveDatabase();
+            DatabaseSelectRemove rmdb = new DatabaseSelectRemove();
             rmdb.ShowDialog();
             SetFunctionalDatabaseNoPrompt();
         }
 
         private void mnStrp_SetDB(object sender, EventArgs e)
         {
-            //When you fix this and let them set a database then remove the comment from SetFunctionalDatabaseNoPrompt();
-            //SetFunctionalDatabaseNoPrompt();
+            DatabaseSelectRemove DBSM = new DatabaseSelectRemove();
+            DBSM.Initialize("SetDatabase");
+            DBSM.ShowDialog();
+            if (StaticInfo.CurrentDatabase != null)
+                lbl_CurrentDatabase.Text = "Current database: " + StaticInfo.CurrentDatabase.DatabaseName;
+            else
+                lbl_CurrentDatabase.Text = "Current database: no functional database found";
         }
 
         private void txt_Search_KeyDown(object sender, KeyEventArgs e)
