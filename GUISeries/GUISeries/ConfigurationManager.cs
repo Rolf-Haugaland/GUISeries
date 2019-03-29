@@ -41,9 +41,6 @@ namespace GUISeries
 
         /// <summary>
         /// returns all the databases in the Settings
-        /// 
-        /// 
-        /// 
         /// working or not. GetFunctionalDatabases() only returns functional databases
         /// </summary>
         /// <returns>All databases in the Settings.txt file, connectable or not</returns>
@@ -130,7 +127,7 @@ namespace GUISeries
             return "";
         }
 
-        CLSerie GetSeriesFromJson(JObject JSerie)
+        public CLSerie GetSeriesFromJson(JObject JSerie)
         {
             JToken attributes = JSerie.GetValue("attributes");
 
@@ -428,9 +425,10 @@ namespace GUISeries
         }
 
         /// <summary>
-        /// Returns all the functional databases in the Settings.txt file. Returns a new List<Database> if none are found
+        /// Returns all the functional databases in the Settings.txt file. If there is a database has default boolean set to true, it will be at the start of the list.
+        /// Returns a new List<Database> if none are found
         /// </summary>
-        /// <returns>All functional databases in Settings.txt. Returns new List<Database> if none are found</returns>
+        /// <returns>All functional databases in Settings.txt. Default DB at start of list. Returns new List<Database> if none are found</returns>
         public List<Database> GetFunctionalDatabases()
         {
             List<Database> databases = GetDatabases();
@@ -439,6 +437,12 @@ namespace GUISeries
             {
                 if (CheckDatabaseConnection(database))
                     CheckedDB.Add(database);
+            }
+            Database DefaultDB = CheckedDB.Find(x => x.DefaultDB == true);
+            if (DefaultDB != null)
+            {
+                CheckedDB.Remove(DefaultDB);
+                CheckedDB.Insert(0, DefaultDB);
             }
             return CheckedDB;
         }

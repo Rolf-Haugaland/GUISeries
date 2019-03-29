@@ -52,6 +52,8 @@ namespace GUISeries
             //Creates the nessecary files and folders
             if (!Directory.Exists(StaticInfo.FolderPath))
                 Directory.CreateDirectory(StaticInfo.FolderPath);
+            if (!Directory.Exists(StaticInfo.LocalSeriesPath))
+                Directory.CreateDirectory(StaticInfo.LocalSeriesPath);
             if (!File.Exists(StaticInfo.DatabaseConfPath))
                 File.Create(StaticInfo.DatabaseConfPath).Close();
             if (!File.Exists(StaticInfo.SettingsPath))
@@ -111,9 +113,40 @@ namespace GUISeries
         private void Form1_Load(object sender, EventArgs e)
         {
             StartupCheck();
-            if(StaticInfo.CurrentDatabase != null)
-                UpdateTextBoxAutoComplete();
+            UpdateTextBoxAutoComplete();
             SetUploadSuggestions();
+        }
+
+        void UpdateTextBoxAutoComplete()
+        {
+            AutoCompleteStringCollection COLSeries = new AutoCompleteStringCollection();
+
+            ConfigurationManager manager = new ConfigurationManager();
+
+            DirectoryInfo info = new DirectoryInfo(StaticInfo.LocalSeriesPath);
+
+            foreach(FileInfo file in info.GetFiles())
+            {
+                JObject JOserie = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(StaticInfo.LocalSeriesPath + file.Name));
+                CLSerie serie = manager.GetSeriesFromJson(JOserie);
+                COLSeries.Add(serie.name);
+            }
+
+            //#1 start: Adds autocompletion options to the textbox. They are taken from the GetSerieNames method which gets it from 
+            //the database
+            if(StaticInfo.CurrentDatabase != null)
+            {
+                List<string> serieNames = GetSerieNames();
+
+                foreach (string name in serieNames)
+                {
+                    if(!COLSeries.Contains(name))
+                        COLSeries.Add(name);
+                }
+            }
+            //#1 end.
+
+            txt_Search.AutoCompleteCustomSource = COLSeries;
         }
 
         void SetUploadSuggestions()
@@ -125,22 +158,6 @@ namespace GUISeries
             //Get the most recent database uploads(CreationTimeStamp, not watchTimeStamp.) Then search the database for the 'highest' 
             //number episode in that series that the user has watched. Put that serie in the lstVw_UploadSuggestions, do this for like the 
             //5-10 most recent uploads, if there are that many. 
-        }
-
-        void UpdateTextBoxAutoComplete()
-        {
-            //#1 start: Adds the autocompletion options to the textbox. They are taken from the GetSerieNames method which gets it from 
-            //the database
-            AutoCompleteStringCollection COLSeries = new AutoCompleteStringCollection();
-            List<string> serieNames = GetSerieNames();
-
-            foreach (string name in serieNames)
-            {
-                COLSeries.Add(name);
-            }
-
-            txt_Search.AutoCompleteCustomSource = COLSeries;
-            //#1 end.
         }
 
         private void lstVIew_ItemActivated(object sender, EventArgs e)
@@ -239,7 +256,16 @@ namespace GUISeries
 
         private void txt_Search_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
+            if(e.Shift && e.KeyCode == Keys.Enter && File.Exists(StaticInfo.LocalSeriesPath + txt_Search.Text + ".json"))
+            {
+                JObject JOserie = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(StaticInfo.LocalSeriesPath + txt_Search.Text + ".json"));
+                ConfigurationManager manager = new ConfigurationManager();
+                CLSerie serie = manager.GetSeriesFromJson(JOserie);
+                AddSeries addSeries = new AddSeries();
+                addSeries.Initialize(serie);
+                addSeries.ShowDialog();
+            }
+            else if (e.KeyCode == Keys.Enter)
                 btn_ConfirmSearch.PerformClick();
         }
     }

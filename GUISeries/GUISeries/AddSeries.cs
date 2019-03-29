@@ -134,20 +134,84 @@ namespace GUISeries
 
         private void txt_TimeStamp_TextChanged(object sender, EventArgs e)
         {
-            try
+            CultureInfo info = new CultureInfo("nb-NO");
+            DateTime TodayCheck = DatetimeWithToday();
+            if(TodayCheck != new DateTime())
             {
-                CultureInfo info = new CultureInfo("nb-NO");
-                DateTime TimeStamp = DateTime.Parse(txt_TimeStamp.Text, info);
-                string Month = TimeStamp.Month.ToString();
-                if (Month.Length == 1)
-                    Month = "0" + Month;
-                lbl_TimeStamp.Text = "Date: " + TimeStamp.Day + ", Month: " + Month + Environment.NewLine + "Year: " + TimeStamp.Year + ", Hour: " + TimeStamp.Hour
-                    + ", Minute: " + TimeStamp.Minute;
+                if(!txt_TimeStamp.Text.Contains("0:0") && TodayCheck.Minute == 0 && TodayCheck.Hour == 0 && TodayCheck.Second == 0 && TodayCheck.Millisecond == 0)
+                {
+                    string Month = TodayCheck.Month.ToString();
+                    if (Month.Length == 1)
+                        Month = "0" + Month;
+                    lbl_TimeStamp.Text = "Date: " + TodayCheck.Day + ", Month: " + Month + Environment.NewLine + "Year: " + TodayCheck.Year + ", no time was detected." + Environment.NewLine +
+                        "setting time to 00:00(earliest point of the date shown)";
+                }
+                else
+                {
+                    string Month = TodayCheck.Month.ToString();
+                    if (Month.Length == 1)
+                        Month = "0" + Month;
+                    lbl_TimeStamp.Text = "Date: " + TodayCheck.Day + ", Month: " + Month + Environment.NewLine + "Year: " + TodayCheck.Year + ", Hour: " + TodayCheck.Hour
+                    + ", Minute: " + TodayCheck.Minute;
+                }
             }
-            catch
+            else
             {
-                lbl_TimeStamp.Text = "No date detected" + Environment.NewLine + "Example: 1.1.2001 23:59";
+                if(DateTime.TryParse(txt_TimeStamp.Text, info, DateTimeStyles.None, out DateTime result))
+                {
+                    string Month = result.Month.ToString();
+                    if (Month.Length == 1)
+                        Month = "0" + Month;
+                    lbl_TimeStamp.Text = "Date: " + result.Day + ", Month: " + Month + Environment.NewLine + "Year: " + result.Year + ", Hour: " + result.Hour
+                        + ", Minute: " + result.Minute;
+                }
+                else
+                    lbl_TimeStamp.Text = "No date detected" + Environment.NewLine + "Example: 1.1.2001 23:59";
             }
+        }
+
+        DateTime DatetimeWithToday()
+        {
+            if (txt_TimeStamp.Text.Length < 5)
+                return new DateTime();
+            if (txt_TimeStamp.Text.Substring(0, 5) == "today")
+            {
+                if (txt_TimeStamp.Text.Length >= 9)
+                {
+                    DateTime TimeStamp = DateTime.Now.Date;
+                    if(txt_TimeStamp.Text.Length >= 11)
+                    {
+                        if (DateTime.TryParse(txt_TimeStamp.Text.Substring(6, 5), out DateTime result3))
+                        {
+                            return result3;
+                        }
+                        else
+                            return TimeStamp;//It makes sense to return TimeStamp. If the textbox contains 12 chars then it wont fit into the other things either(there would be left over text 
+                        //or numbers) Just trust me it makes sense for it to be there.
+                    }
+                    else if(txt_TimeStamp.Text.Length >= 10)
+                    {
+                        if (DateTime.TryParse(txt_TimeStamp.Text.Substring(6, 4), out DateTime result2))
+                        {
+                            return result2;
+                        }
+                        else
+                            return TimeStamp;
+                    }
+                    else if (DateTime.TryParse(txt_TimeStamp.Text.Substring(6, 3), out DateTime result))
+                    {
+                        return result;
+                    }
+                    else
+                    {
+                        return TimeStamp;
+                    }
+                }
+                else
+                    return DateTime.Now.Date;
+            }
+            else
+                return new DateTime();
         }
 
         private void AddSeries_Load(object sender, EventArgs e)

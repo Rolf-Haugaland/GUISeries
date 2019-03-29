@@ -33,6 +33,11 @@ namespace GUISeries
                     MessageBox.Show("Please only select one database at the time.");
                     return;
                 }
+                else if(lstBx_Databases.SelectedItems.Count == 0)
+                {
+                    MessageBox.Show("Please select a database");
+                    return;
+                }
                 if(Action == "RemoveDatabase")
                 {
                     DialogResult result = MessageBox.Show("Are you sure you wish to delete the selected database? Database Name: '" + database.DatabaseName + "' " +
