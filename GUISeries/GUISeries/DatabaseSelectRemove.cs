@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace GUISeries
 {
-    public partial class RemoveDatabase : Form
+    public partial class DatabaseSelectRemove : Form
     {
-        public RemoveDatabase()
+        public DatabaseSelectRemove()
         {
             InitializeComponent();
             UpdateLstBx();

@@ -40,15 +40,10 @@ namespace GUISeries
                 else if (result == DialogResult.No)
                     lbl_CurrentDatabase.Text = "Current database: No functional database found";
             }
-            else if(databases.Count == 1)
+            else if(databases.Count >= 1)
             {
                 StaticInfo.CurrentDatabase = databases[0];
                 lbl_CurrentDatabase.Text = "Current database: " + StaticInfo.CurrentDatabase.DatabaseName;
-            }
-            else if(databases.Count > 1)
-            {
-                SetDatabase setDatabase = new SetDatabase();
-                setDatabase.ShowDialog();
             }
         }
 
@@ -60,7 +55,9 @@ namespace GUISeries
             if (!File.Exists(StaticInfo.DatabaseConfPath))
                 File.Create(StaticInfo.DatabaseConfPath).Close();
             if (!File.Exists(StaticInfo.SettingsPath))
-                File.Create(StaticInfo.SettingsPath);
+                File.Create(StaticInfo.SettingsPath).Close();
+            if (!File.Exists(StaticInfo.CheckSeriesPath))
+                File.Create(StaticInfo.CheckSeriesPath).Close();
 
             SetFunctionalDatabase();
         }
@@ -116,6 +113,18 @@ namespace GUISeries
             StartupCheck();
             if(StaticInfo.CurrentDatabase != null)
                 UpdateTextBoxAutoComplete();
+            SetUploadSuggestions();
+        }
+
+        void SetUploadSuggestions()
+        {
+            //Potentionally add series to json files. So that you wont have to call the api for a serie. When the textbox autofills, 
+            //if the user clicks SHIFT+ENTER then it will automatically select that serie and use it from the json file instead of 
+            //putting it in the list box. Also update this regularly like every week to make sure the locally saved json is up to date. 
+
+            //Get the most recent database uploads(CreationTimeStamp, not watchTimeStamp.) Then search the database for the 'highest' 
+            //number episode in that series that the user has watched. Put that serie in the lstVw_UploadSuggestions, do this for like the 
+            //5-10 most recent uploads, if there are that many. 
         }
 
         void UpdateTextBoxAutoComplete()
@@ -186,58 +195,10 @@ namespace GUISeries
             }
         }
 
-        public List<CLSerie> GetSerie(string SearchQuery)
-        {
-
-            HttpClient client = new HttpClient();
-
-            List<CLSerie> Series = new List<CLSerie>();
-
-            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.api+json"));
-            using (HttpResponseMessage response = client.GetAsync("https://kitsu.io/api/edge/anime?filter[text]=" + SearchQuery).Result)
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var x = response.Content.ReadAsStringAsync();
-                    JObject y = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(x.Result);
-                    var FirstSerie = y.Children().Children().Children().ToArray();
-                    foreach(JToken child in FirstSerie)
-                    {
-                        try
-                        {
-                            JObject child2 = (JObject)child;
-                            if (child2.TryGetValue("id", out JToken JSerie))
-                            {
-                                Series.Add(GetSeriesFromJson(child2));
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            //The conversion might fail it there is only one item in child etc. This happends every time so we just try catch the expected error.
-                        }
-                    }
-                }
-            }
-
-            return Series;
-        }
-
-        CLSerie GetSeriesFromJson(JObject JSerie)
-        {
-            JToken attributes = JSerie.GetValue("attributes");
-
-            JObject jObject = (JObject)attributes;
-
-            CLSerie add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLSerie>(jObject.ToString());
-
-            add.linkToEpisodes = JSerie.SelectToken("relationships.episodes.links.related").ToString();
-
-            return add;
-        }
-
         private void btn_ConfirmSearch_Click(object sender, EventArgs e)
         {
-            List<CLSerie> Series = GetSerie(txt_Search.Text);
+            ConfigurationManager manager = new ConfigurationManager();
+            List<CLSerie> Series = manager.GetSeries(txt_Search.Text);
             currentList = Series;
             lstView_SeriesFromAPI.Items.Clear();
             foreach(CLSerie Serie in Series)

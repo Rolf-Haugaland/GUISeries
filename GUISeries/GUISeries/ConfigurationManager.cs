@@ -40,7 +40,11 @@ namespace GUISeries
         }
 
         /// <summary>
-        /// returns all the databases in the Settings.txt working or not. GetFunctionalDatabases() only returns functional databases
+        /// returns all the databases in the Settings
+        /// 
+        /// 
+        /// 
+        /// working or not. GetFunctionalDatabases() only returns functional databases
         /// </summary>
         /// <returns>All databases in the Settings.txt file, connectable or not</returns>
         public List<Database> GetDatabases()
@@ -53,6 +57,90 @@ namespace GUISeries
             }
 
             return new List<Database>();
+        }
+
+        public List<CLSerie> GetSeries(string SearchQuery)
+        {
+
+            HttpClient client = new HttpClient();
+
+            List<CLSerie> Series = new List<CLSerie>();
+
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.api+json"));
+            using (HttpResponseMessage response = client.GetAsync("https://kitsu.io/api/edge/anime?filter[text]=" + SearchQuery).Result)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var x = response.Content.ReadAsStringAsync();
+                    JObject y = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(x.Result);
+                    var FirstSerie = y.Children().Children().Children().ToArray();
+                    foreach (JToken child in FirstSerie)
+                    {
+                        try
+                        {
+                            JObject child2 = (JObject)child;
+                            if (child2.TryGetValue("id", out JToken JSerie))
+                            {
+                                //Write child2 to file and use GetSeriesFromJson(JObject JSerie) to read it again. 
+
+                                CLSerie add = GetSeriesFromJson(child2);
+                                Series.Add(add);
+                                if(add.status != "finished")
+                                {
+                                    List<string> SeriesToCheck = new List<string>();
+                                    JArray jArray = (JArray)Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(StaticInfo.CheckSeriesPath));
+                                    if(jArray != null)
+                                    {
+                                        foreach (var jToken in jArray)
+                                        {
+                                            SeriesToCheck.Add(jToken.ToString());
+                                        }
+                                    }
+                                    if(!SeriesToCheck.Contains(add.name))
+                                        SeriesToCheck.Add(add.name);
+                                    string writeToFile = Newtonsoft.Json.JsonConvert.SerializeObject(SeriesToCheck);
+                                    File.WriteAllText(StaticInfo.CheckSeriesPath, writeToFile);
+                                }
+                                File.WriteAllText(StaticInfo.FolderPath + "Series\\" + add.name + ".json", child2.ToString());
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            //The conversion might fail it there is only one item in child etc. This happends every time so we just try catch the expected error.
+                        }
+                    }
+                }
+            }
+
+            return Series;
+        }
+
+        public string GetOneSerie(string SerieName)
+        {
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.api+json"));
+            using (HttpResponseMessage response = client.GetAsync("https://kitsu.io/api/edge/anime?[page]limit=1&filter[text]=" + SerieName).Result)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    return response.Content.ReadAsStringAsync().Result;
+                }
+            }
+            return "";
+        }
+
+        CLSerie GetSeriesFromJson(JObject JSerie)
+        {
+            JToken attributes = JSerie.GetValue("attributes");
+
+            JObject jObject = (JObject)attributes;
+
+            CLSerie add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLSerie>(jObject.ToString());
+
+            add.linkToEpisodes = JSerie.SelectToken("relationships.episodes.links.related").ToString();
+
+            return add;
         }
 
         public void UploadEpisodes(List<CLEpisode> episodes, CLSerie serie, DateTime timestamp)

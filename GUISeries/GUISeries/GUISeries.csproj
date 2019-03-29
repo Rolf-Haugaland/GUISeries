@@ -71,6 +71,12 @@
     <Compile Include="AddDatabase.Designer.cs">
       <DependentUpon>AddDatabase.cs</DependentUpon>
     </Compile>
+    <Compile Include="DatabaseSelectRemove.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DatabaseSelectRemove.Designer.cs">
+      <DependentUpon>DatabaseSelectRemove.cs</DependentUpon>
+    </Compile>
     <Compile Include="DisplayInformation.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,18 +92,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ConfigurationManager.cs" />
-    <Compile Include="RemoveDatabase.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="RemoveDatabase.Designer.cs">
-      <DependentUpon>RemoveDatabase.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SetDatabase.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SetDatabase.Designer.cs">
-      <DependentUpon>SetDatabase.cs</DependentUpon>
-    </Compile>
     <Compile Include="StaticInfo.cs" />
     <EmbeddedResource Include="AddSeries.resx">
       <DependentUpon>AddSeries.cs</DependentUpon>
@@ -105,6 +99,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AddDatabase.resx">
       <DependentUpon>AddDatabase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DatabaseSelectRemove.resx">
+      <DependentUpon>DatabaseSelectRemove.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DisplayInformation.resx">
       <DependentUpon>DisplayInformation.cs</DependentUpon>
@@ -121,12 +118,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="RemoveDatabase.resx">
-      <DependentUpon>RemoveDatabase.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SetDatabase.resx">
-      <DependentUpon>SetDatabase.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

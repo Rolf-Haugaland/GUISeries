@@ -1,6 +1,6 @@
 ﻿namespace GUISeries
 {
-    partial class RemoveDatabase
+    partial class DatabaseSelectRemove
     {
         /// <summary>
         /// Required designer variable.
