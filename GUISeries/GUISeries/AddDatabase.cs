@@ -97,6 +97,12 @@ namespace GUISeries
                     MessageBox.Show("Database removed succsessfully");
                 }
             }
+            else
+            {
+                DialogResult result = MessageBox.Show("Do you wish to use this database?", "Use database?", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                    StaticInfo.CurrentDatabase = database;
+            }
         }
 
         private void mnStrp_Help_Click(object sender, EventArgs e)

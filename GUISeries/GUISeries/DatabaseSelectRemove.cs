@@ -46,6 +46,26 @@ namespace GUISeries
                     {
                         databases.Remove(database);
                         manager.OverWriteDatabases(databases);
+                        if (manager.DatabaseCheckEqual(database, StaticInfo.CurrentDatabase))
+                        {
+                            DialogResult SetFunctional = MessageBox.Show("You just removed the database that was currently being used. Do you wish to set another functional database?", "Current " +
+                                "database was removed", MessageBoxButtons.YesNo);
+                            if(SetFunctional == DialogResult.Yes)
+                            {
+                                List<Database> FuncDatabases = manager.GetFunctionalDatabases();
+                                if (FuncDatabases.Count > 0)
+                                    StaticInfo.CurrentDatabase = FuncDatabases[0];
+                                else
+                                {
+                                    StaticInfo.CurrentDatabase = null;
+                                    MessageBox.Show("Did not find a functional database, please add one in Configuration>Add Database");
+                                }
+                            }
+                            else
+                            {
+                                StaticInfo.CurrentDatabase = null;
+                            }
+                        }
                         this.Close();
                     }
                 }

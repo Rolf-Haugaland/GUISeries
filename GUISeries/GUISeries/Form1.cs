@@ -95,21 +95,6 @@ namespace GUISeries
             return showNames;
         }
 
-        void SetFunctionalDatabaseNoPrompt()
-        {
-            ConfigurationManager manager = new ConfigurationManager();
-            List<Database> databases = manager.GetFunctionalDatabases();
-            if(databases.Count == 0)
-            {
-                lbl_CurrentDatabase.Text = "Current database: No functional database found";
-            }
-            else
-            {
-                StaticInfo.CurrentDatabase = databases[0];
-                lbl_CurrentDatabase.Text = "Current database: " + StaticInfo.CurrentDatabase.DatabaseName;
-            }
-        }
-
         private void Form1_Load(object sender, EventArgs e)
         {
             StartupCheck();
@@ -233,14 +218,22 @@ namespace GUISeries
         {
             AddDatabase databaseConfiguration = new AddDatabase();
             databaseConfiguration.ShowDialog();
-            SetFunctionalDatabaseNoPrompt();
         }
 
         private void MnStrp_RemoveDB(object sender, EventArgs e)
         {
             DatabaseSelectRemove rmdb = new DatabaseSelectRemove();
+            rmdb.Initialize("RemoveDatabase");
             rmdb.ShowDialog();
-            SetFunctionalDatabaseNoPrompt();
+            UpdateDBLabel();
+        }
+
+        void UpdateDBLabel()
+        {
+            if (StaticInfo.CurrentDatabase != null)
+                lbl_CurrentDatabase.Text = "Current database: " + StaticInfo.CurrentDatabase.DatabaseName;
+            else
+                lbl_CurrentDatabase.Text = "Current database: None";
         }
 
         private void mnStrp_SetDB(object sender, EventArgs e)
@@ -267,6 +260,11 @@ namespace GUISeries
             }
             else if (e.KeyCode == Keys.Enter)
                 btn_ConfirmSearch.PerformClick();
+        }
+
+        private void ChangeDefaultDB_Click(object sender, EventArgs e)
+        {
+            //Do this sht
         }
     }
 }
