@@ -260,11 +260,26 @@ namespace GUISeries
             }
             else if (e.KeyCode == Keys.Enter)
                 btn_ConfirmSearch.PerformClick();
+
+            if (e.Control && e.KeyCode == Keys.L)
+            {
+                LatestWatched watched = new LatestWatched();
+                watched.ShowDialog();
+            }
         }
 
         private void ChangeDefaultDB_Click(object sender, EventArgs e)
         {
             //Do this sht
+        }
+
+        private void GeneralKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Control && e.KeyCode == Keys.L)
+            {
+                LatestWatched watched = new LatestWatched();
+                watched.ShowDialog();
+            }
         }
     }
 }

@@ -36,10 +36,10 @@
             this.configureChangeDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeDefaultDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lbl_CurrentDatabase = new System.Windows.Forms.Label();
             this.lstVw_UploadSuggestions = new System.Windows.Forms.ListView();
             this.label1 = new System.Windows.Forms.Label();
-            this.changeDefaultDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -73,6 +73,7 @@
             this.lstView_SeriesFromAPI.UseCompatibleStateImageBehavior = false;
             this.lstView_SeriesFromAPI.View = System.Windows.Forms.View.Tile;
             this.lstView_SeriesFromAPI.ItemActivate += new System.EventHandler(this.lstVIew_ItemActivated);
+            this.lstView_SeriesFromAPI.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GeneralKeyDown);
             // 
             // menuStrip1
             // 
@@ -118,6 +119,13 @@
             this.setDatabaseToolStripMenuItem.Text = "Set database";
             this.setDatabaseToolStripMenuItem.Click += new System.EventHandler(this.mnStrp_SetDB);
             // 
+            // changeDefaultDatabaseToolStripMenuItem
+            // 
+            this.changeDefaultDatabaseToolStripMenuItem.Name = "changeDefaultDatabaseToolStripMenuItem";
+            this.changeDefaultDatabaseToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.changeDefaultDatabaseToolStripMenuItem.Text = "Change default database";
+            this.changeDefaultDatabaseToolStripMenuItem.Click += new System.EventHandler(this.ChangeDefaultDB_Click);
+            // 
             // lbl_CurrentDatabase
             // 
             this.lbl_CurrentDatabase.AutoSize = true;
@@ -137,6 +145,7 @@
             this.lstVw_UploadSuggestions.TabIndex = 5;
             this.lstVw_UploadSuggestions.UseCompatibleStateImageBehavior = false;
             this.lstVw_UploadSuggestions.View = System.Windows.Forms.View.Tile;
+            this.lstVw_UploadSuggestions.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GeneralKeyDown);
             // 
             // label1
             // 
@@ -148,13 +157,6 @@
             this.label1.TabIndex = 6;
             this.label1.Text = "Upload suggestions: (Have like naruto episode 5 here, if the user has watched epi" +
     "sode 4)";
-            // 
-            // changeDefaultDatabaseToolStripMenuItem
-            // 
-            this.changeDefaultDatabaseToolStripMenuItem.Name = "changeDefaultDatabaseToolStripMenuItem";
-            this.changeDefaultDatabaseToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
-            this.changeDefaultDatabaseToolStripMenuItem.Text = "Change default database";
-            this.changeDefaultDatabaseToolStripMenuItem.Click += new System.EventHandler(this.ChangeDefaultDB_Click);
             // 
             // Form1
             // 
@@ -172,6 +174,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GeneralKeyDown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
