@@ -20,8 +20,10 @@ namespace GUISeries
             currentSerie = serie;
             ConfigurationManager manager = new ConfigurationManager();
             int currentEpisode = manager.LatestEpisode(serie.name) + 1;
-            if(currentEpisode != -1)
+            if (currentEpisode != 0)
                 txt_EpisodesWatched.Text = currentEpisode.ToString() + "-" + currentEpisode.ToString();
+            else
+                txt_EpisodesWatched.Text = "1-1";
         }
 
         void AddSerie(CLSerie serie)
