@@ -17,5 +17,6 @@ namespace GUISeries
         public int? totalLength;
         public bool? NSFW;
         public string ageRating;
+        public string linkToGenres;
     }
 }

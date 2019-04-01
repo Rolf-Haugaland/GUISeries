@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MySql.Data.MySqlClient;
 using System.IO;
 using System.Threading;
 using Newtonsoft.Json.Linq;
@@ -13,7 +14,7 @@ namespace GUISeries
     {
         static StaticInfo()
         {
-            Thread updateDB = new Thread(updateDBFiles);
+            Thread updateDB = new Thread(KeepUpdated);
             updateDB.IsBackground = true;
             updateDB.Start();
         }
@@ -25,10 +26,13 @@ namespace GUISeries
         public static string CheckSeriesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\ToCheck.json";
         public static string LocalSeriesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\Series\\";
 
-        private static void updateDBFiles()
+        private static void KeepUpdated()
         {
+            bool first = true;
         loop:
-            Thread.Sleep(TimeSpan.FromMinutes(2));
+            if(!first)
+                Thread.Sleep(TimeSpan.FromMinutes(2));
+            first = false;
             DateTime lastCheck = new DateTime();
             if (!File.Exists(FolderPath + "LastCheck.txt"))
                 File.Create(FolderPath + "LastCheck.txt").Close();
@@ -41,6 +45,7 @@ namespace GUISeries
             if (lastCheck < DateTime.Now.AddDays(-1))
             {
                 UpdateFiles();
+                //UpdateDB(); Make a function according to issue #4 on Github.
             }
             else
                 goto loop;

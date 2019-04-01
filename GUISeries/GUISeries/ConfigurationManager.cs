@@ -81,6 +81,7 @@ namespace GUISeries
                                 //Write child2 to file and use GetSeriesFromJson(JObject JSerie) to read it again. 
 
                                 CLSerie add = GetSeriesFromJson(child2);
+                                add.linkToGenres = child2.SelectToken("relationships.genres.links.related").ToString();
                                 Series.Add(add);
                                 if(add.status != "finished")
                                 {
@@ -145,7 +146,7 @@ namespace GUISeries
             CultureInfo info = CultureInfo.CreateSpecificCulture("nb-NO");
             MySqlConnection con = new MySqlConnection(GetConnectionstring());
             MySqlCommand cmd = new MySqlCommand();
-            string SQL = "Insert into Series(Name,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,Length,EpisodeNumber,SeasonNumber,ShowName,TimeStamp) VALUES(";
+            string SQL = "Insert into Series(Name,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,Length,EpisodeNumber,SeasonNumber,ShowName,TimeStamp,Genres,Status) VALUES(";
             int i = 0;
             int count = 1;
             foreach (CLEpisode episode in episodes)
@@ -155,13 +156,13 @@ namespace GUISeries
                 {
                     SQL += "@Name" + i.ToString() + ",@EpisodeCount" + i.ToString() + ",@AgeRating" + i.ToString() + ",@NSFW" + i.ToString() + ",@Synopsis" +
     i.ToString() + ",@TotalShowLength" + i.ToString() + ",@Length" + i.ToString() + ",@EpisodeNumber" + i.ToString() + ",@SeasonNumber" +
-    i.ToString() + ",@ShowName" + i.ToString() + ",@TimeStamp" + i.ToString() + ")";
+    i.ToString() + ",@ShowName" + i.ToString() + ",@TimeStamp" + i.ToString() + ",@Genres" + i.ToString() + ",@Status" + i.ToString() + ")";
                 }
                 else
                 {
                     SQL += "@Name" + i.ToString() + ",@EpisodeCount" + i.ToString() + ",@AgeRating" + i.ToString() + ",@NSFW" + i.ToString() + ",@Synopsis" +
     i.ToString() + ",@TotalShowLength" + i.ToString() + ",@Length" + i.ToString() + ",@EpisodeNumber" + i.ToString() + ",@SeasonNumber" +
-    i.ToString() + ",@ShowName" + i.ToString() + ",@TimeStamp" + i.ToString() + "),(";
+    i.ToString() + ",@ShowName" + i.ToString() + ",@TimeStamp" + i.ToString() + ",@Genres" + i.ToString() + ",@Status" + i.ToString() + "),(";
                 }
                 MySqlParameter parName = new MySqlParameter()
                 {
@@ -229,6 +230,18 @@ namespace GUISeries
                     Value = timestamp
                 };
                 cmd.Parameters.Add(parTimeStamp);
+                MySqlParameter parGenres = new MySqlParameter()
+                {
+                    ParameterName = "@Genres" + i.ToString(),
+                    Value = serie.genres
+                };
+                cmd.Parameters.Add(parGenres);
+                MySqlParameter parStatus = new MySqlParameter()
+                {
+                    ParameterName = "@Status" + i.ToString(),
+                    Value = serie.status
+                };
+                cmd.Parameters.Add(parStatus);
                 count++;
             }
             cmd.Connection = con;
@@ -236,7 +249,6 @@ namespace GUISeries
             con.Open();
             cmd.ExecuteNonQuery();
             con.Close();
-
         }
 
         public List<CLEpisode> GetEpisodes(CLSerie serie, int startEpisode, int endEpisode)

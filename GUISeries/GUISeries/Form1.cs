@@ -281,5 +281,11 @@ namespace GUISeries
                 watched.ShowDialog();
             }
         }
+
+        private void mnStrp_LatestEpsWatched_Click(object sender, EventArgs e)
+        {
+            LatestWatched latestWatched = new LatestWatched();
+            latestWatched.ShowDialog();
+        }
     }
 }

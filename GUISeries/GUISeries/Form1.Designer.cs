@@ -40,6 +40,8 @@
             this.lbl_CurrentDatabase = new System.Windows.Forms.Label();
             this.lstVw_UploadSuggestions = new System.Windows.Forms.ListView();
             this.label1 = new System.Windows.Forms.Label();
+            this.myDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.latestEpisodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -79,7 +81,8 @@
             // 
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.configurationToolStripMenuItem});
+            this.configurationToolStripMenuItem,
+            this.myDataToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
@@ -158,6 +161,21 @@
             this.label1.Text = "Upload suggestions: (Have like naruto episode 5 here, if the user has watched epi" +
     "sode 4)";
             // 
+            // myDataToolStripMenuItem
+            // 
+            this.myDataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.latestEpisodeToolStripMenuItem});
+            this.myDataToolStripMenuItem.Name = "myDataToolStripMenuItem";
+            this.myDataToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
+            this.myDataToolStripMenuItem.Text = "My data";
+            // 
+            // latestEpisodeToolStripMenuItem
+            // 
+            this.latestEpisodeToolStripMenuItem.Name = "latestEpisodeToolStripMenuItem";
+            this.latestEpisodeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.latestEpisodeToolStripMenuItem.Text = "Latest episode";
+            this.latestEpisodeToolStripMenuItem.Click += new System.EventHandler(this.mnStrp_LatestEpsWatched_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -196,6 +214,8 @@
         private System.Windows.Forms.ListView lstVw_UploadSuggestions;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripMenuItem changeDefaultDatabaseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem myDataToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem latestEpisodeToolStripMenuItem;
     }
 }
 
