@@ -51,6 +51,75 @@ namespace GUISeries
                 goto loop;
         }
 
+        private static void UpdateDB()
+        {
+            ConfigurationManager manager = new ConfigurationManager();
+            MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
+            MySqlCommand cmd = new MySqlCommand("SELECT * From Series where 'Status' IS NOT 'finished'", con);
+
+            con.Open();
+            MySqlDataReader reader = cmd.ExecuteReader();
+            con.Close();
+
+            List<CLSerie> OutdatedEpisodes = new List<CLSerie>();
+
+            while(reader.Read())
+            {
+                CLSerie OutdatedEpisode = new CLSerie()
+                {
+                    episodeName = reader["Name"].ToString(),
+                    episodeCount = (int)reader["EpisodeCount"],
+                    ageRating = reader["AgeRating"].ToString(),
+                    NSFW = Convert.ToBoolean(reader["NSFW"]),
+                    synopsis = reader["Synopsis"].ToString(),
+                    totalLength = (int)reader["TotalShowLength"],
+                    length = (int)reader["Length"],
+                    EpisodeNumber = (int)reader["EpisodeNumber"],
+                    seasonNumber = reader["SeasonNumber"].ToString(),
+                    showName = reader["ShowName"].ToString(),
+                    genres = reader["Genres"].ToString().Split(',').ToList(),
+                    name = reader["ShowName"].ToString(),
+                    DBID = (int)reader["ID"]
+                };
+            }
+            OutdatedEpisodes.RemoveAll(x => x.status != "finished");
+            if (OutdatedEpisodes.Count == 0)
+                return;
+
+            foreach(CLSerie serie in OutdatedEpisodes)
+            {
+                CLSerie Finished = GetFinishedSerie(serie.showName);
+                if (Finished != null)
+                {
+                    manager.UpdateDBEntry(Finished);
+                }
+            }
+        }
+
+        public static CLSerie GetFinishedSerie(string SerieName)
+        {
+            ConfigurationManager manager = new ConfigurationManager();
+
+            if(File.Exists(StaticInfo.LocalSeriesPath + SerieName + ".json"))
+            {
+                string JsonString = File.ReadAllText(StaticInfo.LocalSeriesPath + SerieName + ".json");
+
+                CLSerie Serie = manager.GetSeriesFromJson(JObject.Parse(JsonString));
+                if (Serie.status == "finished")
+                {
+                    return Serie;
+                }
+            }
+            else
+            {
+                string JStrSerie = manager.GetOneSerie(SerieName);
+                CLSerie Serie = manager.GetSeriesFromJson((JObject)JObject.Parse(JStrSerie)["data"][0]);
+                if (Serie.status == "finished")
+                    return Serie;
+            }
+            return null;
+        }
+
         private static void UpdateFiles()
         {
             string APath = LocalSeriesPath;

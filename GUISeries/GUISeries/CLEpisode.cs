@@ -8,7 +8,7 @@ namespace GUISeries
     {//If there isnt a JsonProperty mentioned it is either implemented manually or it has the same variable name as the JsonProperty, hence not needed.
         public int? length;
         [JsonProperty("canonicalTitle")]
-        public string name;
+        public string episodeName;
         public string synopsis;
         [JsonProperty("airdate")]
         public DateTime? airDate;

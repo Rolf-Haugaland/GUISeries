@@ -81,7 +81,6 @@ namespace GUISeries
                                 //Write child2 to file and use GetSeriesFromJson(JObject JSerie) to read it again. 
 
                                 CLSerie add = GetSeriesFromJson(child2);
-                                add.linkToGenres = child2.SelectToken("relationships.genres.links.related").ToString();
                                 Series.Add(add);
                                 if(add.status != "finished")
                                 {
@@ -138,6 +137,8 @@ namespace GUISeries
 
             add.linkToEpisodes = JSerie.SelectToken("relationships.episodes.links.related").ToString();
 
+            add.linkToGenres = JSerie.SelectToken("relationships.genres.links.related").ToString();
+
             return add;
         }
 
@@ -146,7 +147,9 @@ namespace GUISeries
             CultureInfo info = CultureInfo.CreateSpecificCulture("nb-NO");
             MySqlConnection con = new MySqlConnection(GetConnectionstring());
             MySqlCommand cmd = new MySqlCommand();
-            string SQL = "Insert into Series(Name,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,Length,EpisodeNumber,SeasonNumber,ShowName,TimeStamp,Genres,Status) VALUES(";
+            string SQL = "";//Fix insert or update
+            //if(InstOrUpdate == "insert")
+                SQL = "Insert into Series(Name,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,Length,EpisodeNumber,SeasonNumber,ShowName,TimeStamp,Genres,Status) VALUES(";
             int i = 0;
             int count = 1;
             foreach (CLEpisode episode in episodes)
@@ -167,7 +170,7 @@ namespace GUISeries
                 MySqlParameter parName = new MySqlParameter()
                 {
                     ParameterName = "@Name" + i.ToString(),
-                    Value = episode.name
+                    Value = episode.episodeName
                 };
                 cmd.Parameters.Add(parName);
                 MySqlParameter parEpisodeCount = new MySqlParameter()
@@ -249,6 +252,15 @@ namespace GUISeries
             con.Open();
             cmd.ExecuteNonQuery();
             con.Close();
+        }
+
+        public void UpdateDBEntry(CLSerie Serie)
+        {
+            MySqlConnection con = new MySqlConnection(GetConnectionstring());
+            MySqlCommand cmd = new MySqlCommand();
+            string SQL = "UPDATE Series(Name,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,Length,EpisodeNumber,SeasonNumber,ShowName,TimeStamp,Genres,Status) VALUES(";
+
+            SQL += " WHERE ID = '" + Serie.DBID.ToString() + "'";
         }
 
         public List<CLEpisode> GetEpisodes(CLSerie serie, int startEpisode, int endEpisode)

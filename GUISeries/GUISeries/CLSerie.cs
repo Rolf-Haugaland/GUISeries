@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace GUISeries
 {
-    public class CLSerie
+    public class CLSerie : CLEpisode
     {
         public string status;
         [JsonProperty("canonicalTitle")]
@@ -18,5 +18,7 @@ namespace GUISeries
         public bool? NSFW;
         public string ageRating;
         public string linkToGenres;
+        //This is used for reference to which ID it has in the database
+        public int DBID;
     }
 }
