@@ -81,15 +81,22 @@ namespace GUISeries
 
         string RemoveOne(string episode)
         {
-            int startingEpisode;
-            int endingEpisode;
+            try
+            {
+                int startingEpisode;
+                int endingEpisode;
 
-            int fIntLength = FInt(episode);
+                int fIntLength = FInt(episode);
 
-            startingEpisode = int.Parse(episode.Substring(0, fIntLength));
-            endingEpisode = int.Parse(episode.Substring(fIntLength + 1, (episode.Length - fIntLength) - 1));
-            endingEpisode -= 1;
-            return startingEpisode.ToString() + "-" + endingEpisode.ToString();
+                startingEpisode = int.Parse(episode.Substring(0, fIntLength));
+                endingEpisode = int.Parse(episode.Substring(fIntLength + 1, (episode.Length - fIntLength) - 1));
+                endingEpisode -= 1;
+                return startingEpisode.ToString() + "-" + endingEpisode.ToString();
+            }
+            catch
+            {
+                return episode;
+            }
         }
 
         /// <summary>

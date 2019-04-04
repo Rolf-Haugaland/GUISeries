@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using MySql.Data.MySqlClient;
+using System.Net.Mail;
 
 namespace GUISeries
 {

@@ -100,9 +100,9 @@ namespace GUISeries
         {
             ConfigurationManager manager = new ConfigurationManager();
 
-            if(File.Exists(StaticInfo.LocalSeriesPath + SerieName + ".json"))
+            if(File.Exists(LocalSeriesPath + SerieName + ".json"))
             {
-                string JsonString = File.ReadAllText(StaticInfo.LocalSeriesPath + SerieName + ".json");
+                string JsonString = File.ReadAllText(LocalSeriesPath + SerieName + ".json");
 
                 CLSerie Serie = manager.GetSeriesFromJson(JObject.Parse(JsonString));
                 if (Serie.status == "finished")

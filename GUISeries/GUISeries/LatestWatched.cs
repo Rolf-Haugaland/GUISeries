@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 
 namespace GUISeries
 {
@@ -40,6 +41,9 @@ namespace GUISeries
 
         void UpdateListBox(string filter)
         {
+
+
+
             listBox1.Items.Clear();
             List<string> AlreadyAdded = new List<string>();
             List<KeyValuePair<string, int>> LatestEpisodesInShows = OriginalLatestEpisodesInShows.ToList();
