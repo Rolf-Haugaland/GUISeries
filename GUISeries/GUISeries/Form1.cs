@@ -137,13 +137,31 @@ namespace GUISeries
 
         void SetUploadSuggestions()
         {
-            //Potentionally add series to json files. So that you wont have to call the api for a serie. When the textbox autofills, 
-            //if the user clicks SHIFT+ENTER then it will automatically select that serie and use it from the json file instead of 
-            //putting it in the list box. Also update this regularly like every week to make sure the locally saved json is up to date. 
-
             //Get the most recent database uploads(CreationTimeStamp, not watchTimeStamp.) Then search the database for the 'highest' 
             //number episode in that series that the user has watched. Put that serie in the lstVw_UploadSuggestions, do this for like the 
             //5-10 most recent uploads, if there are that many. 
+            ConfigurationManager manager = new ConfigurationManager();
+            MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
+            MySqlCommand cmd = new MySqlCommand("select distinct ShowName from (Select * from Series order by UploadTimeStamp) as s limit 10", con);
+
+            con.Open();
+            MySqlDataReader reader = cmd.ExecuteReader();
+            List<string> shows = new List<string>();
+            while(reader.Read())
+            {
+                shows.Add(reader["ShowName"].ToString());
+            }
+            con.Close();
+            if (shows.Count > 0)
+            {
+                //Since it is ordered by UploadTimeStamp(changing SQL query from ASC to DESC doesent seem to do anything so i just reverse the list instead)
+                shows.Reverse();
+                List<KeyValuePair<string, int>> ShowsAndNumbers = new List<KeyValuePair<string, int>>();
+                foreach (string name in shows)
+                {
+                    lstVw_UploadSuggestions.Items.Add(name + ", episode: " + manager.LatestEpisode(name));
+                }
+            }
         }
 
         private void lstVIew_ItemActivated(object sender, EventArgs e)
@@ -156,7 +174,6 @@ namespace GUISeries
 
             //listView1.Items.Add("asd", "abd", "aad");
             //listView1.Items.Add("you", "you", "you");
-
 
             //This is needed incase the user tries to select multiple series and press ENTER, you can only upload one serie at a time. 
 
