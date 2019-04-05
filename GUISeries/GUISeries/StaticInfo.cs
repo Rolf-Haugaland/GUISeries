@@ -19,6 +19,8 @@ namespace GUISeries
             updateDB.Start();
         }
 
+        static bool ConStringRdy = false;
+
         public static Database CurrentDatabase;
         public static string DatabaseConfPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\Databases.json";
         public static string FolderPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\";
@@ -28,6 +30,7 @@ namespace GUISeries
 
         private static void KeepUpdated()
         {
+
             bool first = true;
         loop:
             if(!first)
@@ -45,21 +48,28 @@ namespace GUISeries
             if (lastCheck < DateTime.Now.AddDays(-1))
             {
                 UpdateFiles();
-                //UpdateDB(); Make a function according to issue #4 on Github.
+                //UpdateDB(); a few functions needs to be updated. You dont nessecarily need to get a finisehd series since the data will update weekly.
+                //So you want it to update daily from the API, not wait all the way until it is finished. Also configurationmanager.UpdateDBEntry(CLSerie) is not finished. 
             }
             else
                 goto loop;
         }
 
-        private static void UpdateDB()
+        /// <summary>
+        /// FUNCTION NOT READY YET
+        /// </summary>
+        private static void UpdateDB(string NOTREADY)
         {
+        loop2:
+            Thread.Sleep(100);
+            if (CurrentDatabase == null)
+                goto loop2;
             ConfigurationManager manager = new ConfigurationManager();
             MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
-            MySqlCommand cmd = new MySqlCommand("SELECT * From Series where 'Status' IS NOT 'finished'", con);
+            MySqlCommand cmd = new MySqlCommand("SELECT * From Series where NOT Status = 'finished' OR Status is NULL", con);
 
             con.Open();
             MySqlDataReader reader = cmd.ExecuteReader();
-            con.Close();
 
             List<CLSerie> OutdatedEpisodes = new List<CLSerie>();
 
@@ -82,6 +92,7 @@ namespace GUISeries
                     DBID = (int)reader["ID"]
                 };
             }
+            con.Close();
             OutdatedEpisodes.RemoveAll(x => x.status != "finished");
             if (OutdatedEpisodes.Count == 0)
                 return;
@@ -96,6 +107,11 @@ namespace GUISeries
             }
         }
 
+        /// <summary>
+        /// Returns the finished version of the series if it exists. If no series with status=finished could be found, it returns null.
+        /// </summary>
+        /// <param name="SerieName">The name of the series</param>
+        /// <returns></returns>
         public static CLSerie GetFinishedSerie(string SerieName)
         {
             ConfigurationManager manager = new ConfigurationManager();

@@ -36,27 +36,30 @@
             // 
             this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 20;
-            this.listBox1.Location = new System.Drawing.Point(81, 83);
+            this.listBox1.ItemHeight = 25;
+            this.listBox1.Location = new System.Drawing.Point(108, 102);
+            this.listBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(585, 344);
+            this.listBox1.Size = new System.Drawing.Size(779, 229);
             this.listBox1.TabIndex = 1;
             // 
             // txt_Filter
             // 
-            this.txt_Filter.Location = new System.Drawing.Point(230, 34);
+            this.txt_Filter.Location = new System.Drawing.Point(307, 42);
+            this.txt_Filter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txt_Filter.Name = "txt_Filter";
-            this.txt_Filter.Size = new System.Drawing.Size(242, 20);
+            this.txt_Filter.Size = new System.Drawing.Size(321, 22);
             this.txt_Filter.TabIndex = 2;
             this.txt_Filter.TextChanged += new System.EventHandler(this.txt_Filter_TextChanged);
             // 
             // LatestWatched
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1067, 554);
             this.Controls.Add(this.txt_Filter);
             this.Controls.Add(this.listBox1);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "LatestWatched";
             this.Text = "LatestWatched";
             this.Load += new System.EventHandler(this.LatestWatched_Load);
