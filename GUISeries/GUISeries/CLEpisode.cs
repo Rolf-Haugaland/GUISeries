@@ -16,5 +16,6 @@ namespace GUISeries
         public int? EpisodeNumber;
         public string showName;
         public string seasonNumber;
+        public DateTime TimeStamp;
     }
 }
