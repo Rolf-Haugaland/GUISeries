@@ -12,6 +12,7 @@ namespace GUISeries
     {
         public LatestWatched()
         {
+            DaysNotWatched();
             InitializeComponent();
             StartUp();
         }
@@ -43,7 +44,7 @@ namespace GUISeries
 
             MySqlDataReader reader = cmd.ExecuteReader();
             List<string> boolFromDB = new List<string>();
-            while (reader.Read())
+            while(reader.Read())
             {
                 WholeHistory.Add(new CLSerie()
                 {
@@ -66,7 +67,7 @@ namespace GUISeries
             //Change it so that there is a button to use all episodes, not just current date. This will unlock abillity to sort the items from 1 
             //spesific date by name and (redundant) date
             con.Close();
-            for (int i = 0; WholeHistory.Count > i; i++)
+            for(int i = 0; WholeHistory.Count > i; i++)
             {
                 if (boolFromDB[i] == "0")
                     WholeHistory[i].NSFW = false;
@@ -93,7 +94,7 @@ namespace GUISeries
             UpdateListBox("");
         }
 
-        List<KeyValuePair<string, int>> GetKeyValuePairsFromDB()
+        List<KeyValuePair<string,int>> GetKeyValuePairsFromDB()
         {
             List<KeyValuePair<string, int>> returnThis = new List<KeyValuePair<string, int>>();
             ConfigurationManager manager = new ConfigurationManager();
@@ -141,15 +142,15 @@ namespace GUISeries
             UpdateListBox(txt_Filter.Text);
         }
 
-        // HEAD
+<<<<<<< HEAD
         private void rdBtn_CheckChanged(object sender, EventArgs e)
         {
             RadioButton btn = (RadioButton)sender;
-            if (btn.Name == "rdBtn_OrderByDate")
+            if(btn.Name == "rdBtn_OrderByDate")
             {
                 OrderByDate();
             }
-            else if (btn.Name == "rdBtn_OrderByName")
+            else if(btn.Name == "rdBtn_OrderByName")
             {
                 OrderByName();
             }
@@ -183,7 +184,7 @@ namespace GUISeries
             ConfirmedLastCLicked = false;
             lstVw_ShowHistory.Items.Clear();
             List<ListViewItem> temp = items.ToList();
-            if (chkBx_DateOrAll.Checked)
+            if(chkBx_DateOrAll.Checked)
             {
                 temp = GetAllItemsForDate(dtPicker.Value.Date);
             }
@@ -204,11 +205,11 @@ namespace GUISeries
             ConfirmedLastCLicked = false;
             lstVw_ShowHistory.Items.Clear();
             List<ListViewItem> AddToLstView = items.ToList();
-            if (chkBx_DateOrAll.Checked)
+            if(chkBx_DateOrAll.Checked)
             {
                 AddToLstView = GetAllItemsForDate(dtPicker.Value.Date);
             }
-            if (cmbBox_AscOrDesc.SelectedItem.ToString() == "Descending")
+            if(cmbBox_AscOrDesc.SelectedItem.ToString() == "Descending")
                 AddToLstView = AddToLstView.OrderBy(x => Convert.ToDateTime(x.SubItems[3].Text)).ToList();
             else
                 AddToLstView = AddToLstView.OrderByDescending(x => Convert.ToDateTime(x.SubItems[3].Text)).ToList();
@@ -250,7 +251,7 @@ namespace GUISeries
 
         private void dtPckrValChanged(object sender, EventArgs e)
         {
-            if (chkBx_DateOrAll.Checked)
+            if(chkBx_DateOrAll.Checked)
                 SelectAndOrderByDate(dtPicker.Value.Date);
         }
 
@@ -260,8 +261,7 @@ namespace GUISeries
                 SelectAndOrderByDate(dtPicker.Value.Date);
             else
                 UpdateBasedOnSelections();
-        }
-
+=======
         List<DateTime> DaysNotWatched()
         {
             ConfigurationManager manager = new ConfigurationManager();
@@ -273,7 +273,7 @@ namespace GUISeries
             con.Open();
 
             MySqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            while(reader.Read())
             {
                 AllDates.Add((DateTime)reader["TimeStamp"]);
             }
@@ -295,7 +295,7 @@ namespace GUISeries
             DateTime second = AllDates.Max();
             List<DateTime> AllBetween = DaysBetween(first, second);
             List<DateTime> NotWatched = AllBetween.FindAll(x => !AllDates.Contains(x.Date));
-            MessageBox.Show("Starting from day " + first.Date.ToString("dd.MM.yyyy") + " to day " + second.Date.ToString("dd.MM.yyyy") + " you have not watched any episodes " + NotWatched.Count.ToString() + " days");
+            MessageBox.Show("Starting from day " + first.Date.ToString("dd.MM.yyyy")+ " to day " + second.Date.ToString("dd.MM.yyyy") + " you have not watched any episodes " + NotWatched.Count.ToString() + " days");
             return NotWatched;
         }
 
@@ -333,6 +333,7 @@ namespace GUISeries
                 allDates.Add(first.AddDays(diff));
                 return allDates;
             }
+>>>>>>> 80686b331fac0827727d6f69e1835ce7c832d7e8
         }
     }
 }

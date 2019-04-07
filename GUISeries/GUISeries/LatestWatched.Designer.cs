@@ -49,14 +49,16 @@
             this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 20;
-            this.listBox1.Location = new System.Drawing.Point(82, 65);
+            this.listBox1.Location = new System.Drawing.Point(62, 53);
+            this.listBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(585, 144);
+            this.listBox1.Size = new System.Drawing.Size(640, 104);
             this.listBox1.TabIndex = 1;
             // 
             // txt_Filter
             // 
-            this.txt_Filter.Location = new System.Drawing.Point(231, 16);
+            this.txt_Filter.Location = new System.Drawing.Point(263, 20);
+            this.txt_Filter.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txt_Filter.Name = "txt_Filter";
             this.txt_Filter.Size = new System.Drawing.Size(242, 20);
             this.txt_Filter.TabIndex = 2;
@@ -72,9 +74,10 @@
             this.EpNum,
             this.SeasonNumber,
             this.TimeStamp});
-            this.lstVw_ShowHistory.Location = new System.Drawing.Point(82, 257);
+            this.lstVw_ShowHistory.Location = new System.Drawing.Point(62, 209);
+            this.lstVw_ShowHistory.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.lstVw_ShowHistory.Name = "lstVw_ShowHistory";
-            this.lstVw_ShowHistory.Size = new System.Drawing.Size(585, 140);
+            this.lstVw_ShowHistory.Size = new System.Drawing.Size(640, 198);
             this.lstVw_ShowHistory.TabIndex = 3;
             this.lstVw_ShowHistory.UseCompatibleStateImageBehavior = false;
             this.lstVw_ShowHistory.View = System.Windows.Forms.View.Details;
@@ -102,7 +105,8 @@
             // rdBtn_OrderByName
             // 
             this.rdBtn_OrderByName.AutoSize = true;
-            this.rdBtn_OrderByName.Location = new System.Drawing.Point(82, 224);
+            this.rdBtn_OrderByName.Location = new System.Drawing.Point(107, 182);
+            this.rdBtn_OrderByName.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.rdBtn_OrderByName.Name = "rdBtn_OrderByName";
             this.rdBtn_OrderByName.Size = new System.Drawing.Size(96, 17);
             this.rdBtn_OrderByName.TabIndex = 4;
@@ -114,7 +118,8 @@
             // rdBtn_OrderByDate
             // 
             this.rdBtn_OrderByDate.AutoSize = true;
-            this.rdBtn_OrderByDate.Location = new System.Drawing.Point(184, 224);
+            this.rdBtn_OrderByDate.Location = new System.Drawing.Point(206, 182);
+            this.rdBtn_OrderByDate.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.rdBtn_OrderByDate.Name = "rdBtn_OrderByDate";
             this.rdBtn_OrderByDate.Size = new System.Drawing.Size(91, 17);
             this.rdBtn_OrderByDate.TabIndex = 5;
@@ -126,7 +131,8 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(281, 212);
+            this.label1.Location = new System.Drawing.Point(301, 167);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(236, 13);
             this.label1.TabIndex = 10;
@@ -134,28 +140,31 @@
             // 
             // dtPicker
             // 
-            this.dtPicker.Location = new System.Drawing.Point(281, 228);
+            this.dtPicker.Location = new System.Drawing.Point(301, 182);
+            this.dtPicker.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.dtPicker.Name = "dtPicker";
-            this.dtPicker.Size = new System.Drawing.Size(200, 20);
+            this.dtPicker.Size = new System.Drawing.Size(182, 20);
             this.dtPicker.TabIndex = 11;
             this.dtPicker.ValueChanged += new System.EventHandler(this.dtPckrValChanged);
             // 
             // cmbBox_AscOrDesc
             // 
             this.cmbBox_AscOrDesc.FormattingEnabled = true;
-            this.cmbBox_AscOrDesc.Location = new System.Drawing.Point(4, 223);
+            this.cmbBox_AscOrDesc.Location = new System.Drawing.Point(3, 181);
+            this.cmbBox_AscOrDesc.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.cmbBox_AscOrDesc.Name = "cmbBox_AscOrDesc";
-            this.cmbBox_AscOrDesc.Size = new System.Drawing.Size(72, 21);
+            this.cmbBox_AscOrDesc.Size = new System.Drawing.Size(88, 21);
             this.cmbBox_AscOrDesc.TabIndex = 12;
             this.cmbBox_AscOrDesc.SelectedIndexChanged += new System.EventHandler(this.cmBoxIndexChanged);
             // 
             // lbl_LstItemCount
             // 
             this.lbl_LstItemCount.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lbl_LstItemCount.Location = new System.Drawing.Point(0, 400);
+            this.lbl_LstItemCount.Location = new System.Drawing.Point(0, 409);
+            this.lbl_LstItemCount.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lbl_LstItemCount.Name = "lbl_LstItemCount";
-            this.lbl_LstItemCount.Padding = new System.Windows.Forms.Padding(78, 0, 0, 35);
-            this.lbl_LstItemCount.Size = new System.Drawing.Size(800, 50);
+            this.lbl_LstItemCount.Padding = new System.Windows.Forms.Padding(58, 0, 0, 28);
+            this.lbl_LstItemCount.Size = new System.Drawing.Size(800, 41);
             this.lbl_LstItemCount.TabIndex = 13;
             this.lbl_LstItemCount.Text = "The list is currently showing x items";
             this.lbl_LstItemCount.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -163,7 +172,8 @@
             // chkBx_DateOrAll
             // 
             this.chkBx_DateOrAll.AutoSize = true;
-            this.chkBx_DateOrAll.Location = new System.Drawing.Point(487, 231);
+            this.chkBx_DateOrAll.Location = new System.Drawing.Point(497, 185);
+            this.chkBx_DateOrAll.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.chkBx_DateOrAll.Name = "chkBx_DateOrAll";
             this.chkBx_DateOrAll.Size = new System.Drawing.Size(141, 17);
             this.chkBx_DateOrAll.TabIndex = 14;

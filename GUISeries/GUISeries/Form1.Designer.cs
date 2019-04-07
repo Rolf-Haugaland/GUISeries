@@ -37,11 +37,11 @@
             this.removeDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changeDefaultDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.myDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.latestEpisodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lbl_CurrentDatabase = new System.Windows.Forms.Label();
             this.lstVw_UploadSuggestions = new System.Windows.Forms.ListView();
             this.label1 = new System.Windows.Forms.Label();
-            this.myDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.latestEpisodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -68,9 +68,9 @@
             // lstView_SeriesFromAPI
             // 
             this.lstView_SeriesFromAPI.Alignment = System.Windows.Forms.ListViewAlignment.Default;
-            this.lstView_SeriesFromAPI.Location = new System.Drawing.Point(219, 141);
+            this.lstView_SeriesFromAPI.Location = new System.Drawing.Point(152, 101);
             this.lstView_SeriesFromAPI.Name = "lstView_SeriesFromAPI";
-            this.lstView_SeriesFromAPI.Size = new System.Drawing.Size(337, 149);
+            this.lstView_SeriesFromAPI.Size = new System.Drawing.Size(451, 189);
             this.lstView_SeriesFromAPI.TabIndex = 2;
             this.lstView_SeriesFromAPI.UseCompatibleStateImageBehavior = false;
             this.lstView_SeriesFromAPI.View = System.Windows.Forms.View.Tile;
@@ -129,6 +129,21 @@
             this.changeDefaultDatabaseToolStripMenuItem.Text = "Change default database";
             this.changeDefaultDatabaseToolStripMenuItem.Click += new System.EventHandler(this.ChangeDefaultDB_Click);
             // 
+            // myDataToolStripMenuItem
+            // 
+            this.myDataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.latestEpisodeToolStripMenuItem});
+            this.myDataToolStripMenuItem.Name = "myDataToolStripMenuItem";
+            this.myDataToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
+            this.myDataToolStripMenuItem.Text = "My data";
+            // 
+            // latestEpisodeToolStripMenuItem
+            // 
+            this.latestEpisodeToolStripMenuItem.Name = "latestEpisodeToolStripMenuItem";
+            this.latestEpisodeToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.latestEpisodeToolStripMenuItem.Text = "Latest episode";
+            this.latestEpisodeToolStripMenuItem.Click += new System.EventHandler(this.mnStrp_LatestEpsWatched_Click);
+            // 
             // lbl_CurrentDatabase
             // 
             this.lbl_CurrentDatabase.AutoSize = true;
@@ -142,9 +157,9 @@
             // lstVw_UploadSuggestions
             // 
             this.lstVw_UploadSuggestions.Alignment = System.Windows.Forms.ListViewAlignment.Default;
-            this.lstVw_UploadSuggestions.Location = new System.Drawing.Point(274, 332);
+            this.lstVw_UploadSuggestions.Location = new System.Drawing.Point(236, 332);
             this.lstVw_UploadSuggestions.Name = "lstVw_UploadSuggestions";
-            this.lstVw_UploadSuggestions.Size = new System.Drawing.Size(214, 109);
+            this.lstVw_UploadSuggestions.Size = new System.Drawing.Size(291, 109);
             this.lstVw_UploadSuggestions.TabIndex = 5;
             this.lstVw_UploadSuggestions.UseCompatibleStateImageBehavior = false;
             this.lstVw_UploadSuggestions.View = System.Windows.Forms.View.Tile;
@@ -153,28 +168,13 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(360, 315);
+            this.label1.Location = new System.Drawing.Point(331, 316);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(428, 13);
             this.label1.TabIndex = 6;
             this.label1.Text = "Upload suggestions: (Have like naruto episode 5 here, if the user has watched epi" +
     "sode 4)";
-            // 
-            // myDataToolStripMenuItem
-            // 
-            this.myDataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.latestEpisodeToolStripMenuItem});
-            this.myDataToolStripMenuItem.Name = "myDataToolStripMenuItem";
-            this.myDataToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
-            this.myDataToolStripMenuItem.Text = "My data";
-            // 
-            // latestEpisodeToolStripMenuItem
-            // 
-            this.latestEpisodeToolStripMenuItem.Name = "latestEpisodeToolStripMenuItem";
-            this.latestEpisodeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.latestEpisodeToolStripMenuItem.Text = "Latest episode";
-            this.latestEpisodeToolStripMenuItem.Click += new System.EventHandler(this.mnStrp_LatestEpsWatched_Click);
             // 
             // Form1
             // 
