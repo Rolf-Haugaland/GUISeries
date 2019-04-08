@@ -7,14 +7,15 @@ namespace GUISeries
 {
     public partial class AddSeries : Form
     {
-        public AddSeries()
+        public AddSeries(CLSerie Serie)
         {
             InitializeComponent();
+            Startup(Serie);
         }
 
         CLSerie currentSerie = null;
 
-        public void Initialize(CLSerie serie)
+        private void Startup(CLSerie serie)
         {
             lbl_Heading.Text = serie.name + ", which episodes have you watched ?";
             currentSerie = serie;

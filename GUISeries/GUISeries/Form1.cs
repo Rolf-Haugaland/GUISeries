@@ -193,9 +193,8 @@ namespace GUISeries
                 MessageBox.Show("Vennligst velg en ting du vil laste opp");
                 return;
             }
-            AddSeries addSeries = new AddSeries();
             CLSerie serie = currentList.Find(x => x.name == lstView_SeriesFromAPI.SelectedItems[0].Name);
-            addSeries.Initialize(serie);
+            AddSeries addSeries = new AddSeries(serie);
             addSeries.ShowDialog();
             ConfigurationManager manager = new ConfigurationManager();
             List<Database> databases = manager.GetFunctionalDatabases();
@@ -236,12 +235,12 @@ namespace GUISeries
         {
             AddDatabase databaseConfiguration = new AddDatabase();
             databaseConfiguration.ShowDialog();
+            UpdateDBLabel();
         }
 
         private void MnStrp_RemoveDB(object sender, EventArgs e)
         {
-            DatabaseSelectRemove rmdb = new DatabaseSelectRemove();
-            rmdb.Initialize("RemoveDatabase");
+            DatabaseSelectRemove rmdb = new DatabaseSelectRemove("RemoveDatabase");
             rmdb.ShowDialog();
             UpdateDBLabel();
         }
@@ -256,24 +255,19 @@ namespace GUISeries
 
         private void mnStrp_SetDB(object sender, EventArgs e)
         {
-            DatabaseSelectRemove DBSM = new DatabaseSelectRemove();
-            DBSM.Initialize("SetDatabase");
+            DatabaseSelectRemove DBSM = new DatabaseSelectRemove("SetDatabase");
             DBSM.ShowDialog();
-            if (StaticInfo.CurrentDatabase != null)
-                lbl_CurrentDatabase.Text = "Current database: " + StaticInfo.CurrentDatabase.DatabaseName;
-            else
-                lbl_CurrentDatabase.Text = "Current database: no functional database found";
+            UpdateDBLabel();
         }
 
         private void txt_Search_KeyDown(object sender, KeyEventArgs e)
         {
             if(e.Shift && e.KeyCode == Keys.Enter && File.Exists(StaticInfo.LocalSeriesPath + txt_Search.Text + ".json"))
             {
-                JObject JOserie = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(StaticInfo.LocalSeriesPath + txt_Search.Text + ".json"));
                 ConfigurationManager manager = new ConfigurationManager();
+                JObject JOserie = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(StaticInfo.LocalSeriesPath + txt_Search.Text + ".json"));
                 CLSerie serie = manager.GetSeriesFromJson(JOserie);
-                AddSeries addSeries = new AddSeries();
-                addSeries.Initialize(serie);
+                AddSeries addSeries = new AddSeries(serie);
                 addSeries.ShowDialog();
             }
             else if (e.KeyCode == Keys.Enter)
@@ -288,7 +282,8 @@ namespace GUISeries
 
         private void ChangeDefaultDB_Click(object sender, EventArgs e)
         {
-            //Do this sht
+            DatabaseSelectRemove setDefault = new DatabaseSelectRemove("ChangeDefaultDatabase");
+            setDefault.ShowDialog();
         }
 
         private void GeneralKeyDown(object sender, KeyEventArgs e)

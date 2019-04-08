@@ -19,8 +19,6 @@ namespace GUISeries
             updateDB.Start();
         }
 
-        static bool ConStringRdy = false;
-
         public static Database CurrentDatabase;
         public static string DatabaseConfPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\Databases.json";
         public static string FolderPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\";

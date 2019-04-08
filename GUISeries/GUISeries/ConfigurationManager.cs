@@ -21,10 +21,8 @@ namespace GUISeries
         /// <returns></returns>
         public int LatestEpisode(string SerieName)
         {
-            Database database = StaticInfo.CurrentDatabase;
             MySqlCommand cmd = new MySqlCommand("Select * from Series where ShowName = '" + SerieName + "'");
-            MySqlConnection con = new MySqlConnection("Server = " + database.DatabaseIP + "; Port = " + database.DatabasePort + "; Database = " + database.DatabaseName + 
-                "; Uid = " + database.DatabaseUname + ";Pwd = " + database.DatabasePW + ";");
+            MySqlConnection con = new MySqlConnection(GetConnectionstring());
             cmd.Connection = con;
             con.Open();
             MySqlDataReader reader = cmd.ExecuteReader();
@@ -263,6 +261,49 @@ namespace GUISeries
             SQL += " WHERE ID = '" + Serie.DBID.ToString() + "'";
         }
 
+        /// <summary>
+        /// Sets the default database to the database provided. Also sets the previous default database to no longer be a default database.
+        /// </summary>
+        /// <param name="database"></param>
+        public void SetDefaultDB(Database database)
+        {
+            List<Database> databases = GetDatabases();
+            List<Database> defaultDB = databases.FindAll(x => x.DefaultDB);
+            if (databases.Count > 1)//Arguabely bad error handeling, will look into prompting the user to resolve this later, but the exam is closing in, it is not priority work.
+                throw new Exception("SetDefaultDB found that there exists more than 1 default database, this is not supposed to happen");
+            else if(defaultDB.Count == 1)
+            {
+                //If the databases are equal then might as well return since that database is already the default one. 
+                if (!DatabaseCheckEqual(database, defaultDB[0]))
+                {
+                    int RemoveAt = databases.FindIndex(x => x.DefaultDB);
+                    databases.RemoveAt(RemoveAt);
+                    defaultDB[0].DefaultDB = false;
+                    databases.Add(defaultDB[0]);
+
+                    RemoveAt = 0;
+
+                    foreach (Database db in databases)
+                    {
+                        RemoveAt++;
+                        if (DatabaseCheckEqual(database, db))
+                        {
+                            break;
+                        }
+                    }
+
+                    databases.RemoveAt(RemoveAt - 1);
+
+                    database.DefaultDB = true;
+
+                    databases.Add(database);
+
+                }
+                else//Futile return
+                    return;
+            }
+        }
+
         public List<CLEpisode> GetEpisodes(CLSerie serie, int startEpisode, int endEpisode)
         {
             HttpClient client = new HttpClient();
@@ -495,9 +536,13 @@ namespace GUISeries
 
         public string GetConnectionstring()
         {
+            ConfigurationManager manager = new ConfigurationManager();
             if (StaticInfo.CurrentDatabase != null)
-                return "Server=" + StaticInfo.CurrentDatabase.DatabaseIP + ";Port=" + StaticInfo.CurrentDatabase.DatabasePort + ";Database=" + StaticInfo.CurrentDatabase.DatabaseName + ";Uid=" +
-                "" + StaticInfo.CurrentDatabase.DatabaseUname + ";Pwd=" + StaticInfo.CurrentDatabase.DatabasePW + ";";
+                if (manager.CheckDatabaseConnection(StaticInfo.CurrentDatabase))
+                    return "Server=" + StaticInfo.CurrentDatabase.DatabaseIP + ";Port=" + StaticInfo.CurrentDatabase.DatabasePort + ";Database=" + StaticInfo.CurrentDatabase.DatabaseName + ";Uid=" +
+                        "" + StaticInfo.CurrentDatabase.DatabaseUname + ";Pwd=" + StaticInfo.CurrentDatabase.DatabasePW + ";";
+                else
+                    return "";
             else
                 return "";
         }

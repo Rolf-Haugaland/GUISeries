@@ -12,9 +12,10 @@ namespace GUISeries
 {
     public partial class DatabaseSelectRemove : Form
     {
-        public DatabaseSelectRemove()
+        public DatabaseSelectRemove(string Action)
         {
             InitializeComponent();
+            Startup(Action);
             UpdateLstBx();
         }
 
@@ -75,13 +76,24 @@ namespace GUISeries
                     StaticInfo.CurrentDatabase = database;
                     this.Close();
                 }
+                else if(Action == "ChangeDefaultDatabase")
+                {
+                    manager.SetDefaultDB(database);
+                    MessageBox.Show("New default database set, database IP: " + database.DatabaseIP + " database name: " + database.DatabasePort + " database name: " + database.DatabaseName);
+                    this.Close();
+                }
             }
         }
 
-        public void Initialize(string InitializeAction)
+        void Startup(string InitializeAction)
         {
             if (InitializeAction == "SetDatabase")
                 lbl_Heading.Text = "Please select the database you want to use.";
+            else if (InitializeAction == "ChangeDefaultDatabase")
+                lbl_Heading.Text = "Please select the database you want to set to the new default";
+            else if (InitializeAction == "RemoveDatabase")
+                lbl_Heading.Text = "Select the database you want to remove";
+
             Action = InitializeAction;
         }
 
@@ -89,11 +101,11 @@ namespace GUISeries
         {
             ConfigurationManager manager = new ConfigurationManager();
             databases = manager.GetDatabases();
-
             lstBx_Databases.Items.Clear();
             foreach (Database db in databases)
             {
-                lstBx_Databases.Items.Add(db.DatabaseName);
+                if(!(Action == "ChangeDefaultDatabase" && db.DefaultDB))
+                    lstBx_Databases.Items.Add(db.DatabaseName);
             }
         }
     }
