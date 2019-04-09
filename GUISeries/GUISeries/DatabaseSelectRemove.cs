@@ -46,7 +46,7 @@ namespace GUISeries
                     if (result == DialogResult.Yes)
                     {
                         databases.Remove(database);
-                        manager.OverWriteDatabases(databases);
+                        manager.OverWriteDatabases(databases, StaticInfo.DatabaseConfPath);
                         if (manager.DatabaseCheckEqual(database, StaticInfo.CurrentDatabase))
                         {
                             DialogResult SetFunctional = MessageBox.Show("You just removed the database that was currently being used. Do you wish to set another functional database?", "Current " +

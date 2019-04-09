@@ -61,6 +61,8 @@ namespace GUISeries
                 File.Create(StaticInfo.SettingsPath).Close();
             if (!File.Exists(StaticInfo.CheckSeriesPath))
                 File.Create(StaticInfo.CheckSeriesPath).Close();
+            if (!File.Exists(StaticInfo.FuncDatabasesPath))
+                File.Create(StaticInfo.FuncDatabasesPath).Close();
 
             SetFunctionalDatabase();
         }

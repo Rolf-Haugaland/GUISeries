@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Windows.Forms;
 using System.Net;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace GUISeries
 {
@@ -25,6 +28,11 @@ namespace GUISeries
             if (!int.TryParse(txt_DBPort.Text, out int NotUsed))
             {
                 MessageBox.Show("Please type a valid port", "Invalid port");
+                return;
+            }
+            if(txt_DBName.Text.Contains(","))
+            {
+                MessageBox.Show("The database name cannot contain a comma");
                 return;
             }
 
@@ -52,7 +60,7 @@ namespace GUISeries
                         {
                             databases[Index].DefaultDB = false;
                             databases.Add(database);
-                            manager.OverWriteDatabases(databases);
+                            manager.OverWriteDatabases(databases, StaticInfo.DatabaseConfPath);
                             ConfirmDatabase(database);
                             this.Close();
                             return;//return since this.close does not stop method execution
@@ -86,7 +94,7 @@ namespace GUISeries
         void ConfirmDatabase(Database database)
         {
             ConfigurationManager manager = new ConfigurationManager();
-            MessageBox.Show("Database added succsessfully", "Succsess");
+
             bool Connectable = manager.CheckDatabaseConnection(database);
             if (!Connectable)
             {
@@ -99,6 +107,45 @@ namespace GUISeries
             }
             else
             {
+                if(!manager.CheckIfTableExists(database))
+                {
+                    manager.CreateTable(database, "");
+                }
+                else
+                {
+                    if(!manager.CheckIfTableIsValid(database))
+                    {
+                        DialogResult OverwriteDB = MessageBox.Show("It seems like you already have a Series table in your database and it seems uncompatible with this program. Click " +
+                            "yes if you want to delete it and create a new one that works with this program, click no if you want to take a backup first " +
+                            "or use another database.", "Overwrite current database?", MessageBoxButtons.YesNoCancel);
+                        if (OverwriteDB == DialogResult.Yes)
+                        {
+                            DialogResult Confirm = MessageBox.Show("Overwriting the current Series table with a fresh table...", "Are you sure?",
+                                MessageBoxButtons.YesNoCancel);
+                            if (Confirm == DialogResult.Yes)
+                            {
+                                manager.CreateTable(database, "");
+                                List<Database> FuncDBToFile = new List<Database>();
+                                string jsonstring = File.ReadAllText(StaticInfo.FuncDatabasesPath);
+                                if (!string.IsNullOrWhiteSpace(jsonstring))
+                                {
+                                    FuncDBToFile = manager.GetDBFromJsonString(jsonstring);
+                                }
+                                FuncDBToFile.Add(database);
+
+                                manager.OverWriteDatabases(FuncDBToFile, StaticInfo.FuncDatabasesPath);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        List<Database> FuncDBToFile = manager.GetDBFromJsonString(File.ReadAllText(StaticInfo.FuncDatabasesPath));
+
+                        FuncDBToFile.Add(database);
+
+                        manager.OverWriteDatabases(FuncDBToFile, StaticInfo.FuncDatabasesPath);
+                    }
+                }
                 DialogResult result = MessageBox.Show("Do you wish to use this database?", "Use database?", MessageBoxButtons.YesNo);
                 if (result == DialogResult.Yes)
                     StaticInfo.CurrentDatabase = database;

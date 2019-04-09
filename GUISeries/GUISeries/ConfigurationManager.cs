@@ -29,7 +29,7 @@ namespace GUISeries
             List<int> Episodes = new List<int>();
             while (reader.Read())
             {
-               Episodes.Add(Convert.ToInt16(reader["EpisodeNumber"]));
+                Episodes.Add(Convert.ToInt16(reader["EpisodeNumber"]));
             }
             if (Episodes.Count != 0)
                 return Episodes.Max();
@@ -80,18 +80,18 @@ namespace GUISeries
 
                                 CLSerie add = GetSeriesFromJson(child2);
                                 Series.Add(add);
-                                if(add.status != "finished")
+                                if (add.status != "finished")
                                 {
                                     List<string> SeriesToCheck = new List<string>();
                                     JArray jArray = (JArray)Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(StaticInfo.CheckSeriesPath));
-                                    if(jArray != null)
+                                    if (jArray != null)
                                     {
                                         foreach (var jToken in jArray)
                                         {
                                             SeriesToCheck.Add(jToken.ToString());
                                         }
                                     }
-                                    if(!SeriesToCheck.Contains(add.name))
+                                    if (!SeriesToCheck.Contains(add.name))
                                         SeriesToCheck.Add(add.name);
                                     string writeToFile = Newtonsoft.Json.JsonConvert.SerializeObject(SeriesToCheck);
                                     File.WriteAllText(StaticInfo.CheckSeriesPath, writeToFile);
@@ -146,14 +146,14 @@ namespace GUISeries
             MySqlConnection con = new MySqlConnection(GetConnectionstring());
             MySqlCommand cmd = new MySqlCommand();
             string SQL = "";//Fix insert or update
-            //if(InstOrUpdate == "insert")
-                SQL = "Insert into Series(Name,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,Length,EpisodeNumber,SeasonNumber,ShowName,TimeStamp,Genres,Status) VALUES(";
+                            //if(InstOrUpdate == "insert")
+            SQL = "Insert into Series(Name,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,Length,EpisodeNumber,SeasonNumber,ShowName,TimeStamp,Genres,Status) VALUES(";
             int i = 0;
             int count = 1;
             foreach (CLEpisode episode in episodes)
             {
                 i++;
-                if(count == episodes.Count)
+                if (count == episodes.Count)
                 {
                     SQL += "@Name" + i.ToString() + ",@EpisodeCount" + i.ToString() + ",@AgeRating" + i.ToString() + ",@NSFW" + i.ToString() + ",@Synopsis" +
     i.ToString() + ",@TotalShowLength" + i.ToString() + ",@Length" + i.ToString() + ",@EpisodeNumber" + i.ToString() + ",@SeasonNumber" +
@@ -271,7 +271,7 @@ namespace GUISeries
             List<Database> defaultDB = databases.FindAll(x => x.DefaultDB);
             if (databases.Count > 1)//Arguabely bad error handeling, will look into prompting the user to resolve this later, but the exam is closing in, it is not priority work.
                 throw new Exception("SetDefaultDB found that there exists more than 1 default database, this is not supposed to happen");
-            else if(defaultDB.Count == 1)
+            else if (defaultDB.Count == 1)
             {
                 //If the databases are equal then might as well return since that database is already the default one. 
                 if (!DatabaseCheckEqual(database, defaultDB[0]))
@@ -394,7 +394,7 @@ namespace GUISeries
                 return i;
         }
 
-        private List<Database> GetDBFromJsonString(string JsonString)
+        public List<Database> GetDBFromJsonString(string JsonString)
         {
             List<Database> databases = new List<Database>();
             JArray jArray = (JArray)Newtonsoft.Json.JsonConvert.DeserializeObject(JsonString);
@@ -413,10 +413,10 @@ namespace GUISeries
             return databases;
         }
 
-        public void OverWriteDatabases(List<Database> databases)
+        public void OverWriteDatabases(List<Database> databases, string path)
         {
             string data = Newtonsoft.Json.JsonConvert.SerializeObject(databases);
-            File.WriteAllText(StaticInfo.DatabaseConfPath, data);
+            File.WriteAllText(path, data);
         }
 
         public void RemoveDatabase(Database database)
@@ -431,7 +431,7 @@ namespace GUISeries
                 if (DatabaseCheckEqual(databases[i], database))
                 {
                     databases.RemoveAt(i);
-                    OverWriteDatabases(databases);
+                    OverWriteDatabases(databases, StaticInfo.DatabaseConfPath);
                     return;
                 }
             }
@@ -451,7 +451,7 @@ namespace GUISeries
             databases.Add(database);
 
             //If there are more than 1 databases in the databases list that means there is already(at least) one database and the user is adding another one
-            if(databases.Count > 1)
+            if (databases.Count > 1)
             {
                 //This loop checks each and every element in the databases and if it is a duplicate it returns 1, which indicates failure due to duplicate database
                 for (int i = 0; databases.Count - 1 > i; i++)
@@ -498,7 +498,7 @@ namespace GUISeries
         {
             List<Database> databases = GetDatabases();
             List<Database> CheckedDB = new List<Database>();
-            foreach(Database database in databases)
+            foreach (Database database in databases)
             {
                 if (CheckDatabaseConnection(database))
                     CheckedDB.Add(database);
@@ -520,7 +520,7 @@ namespace GUISeries
         public bool CheckDatabaseConnection(Database database)
         {
             MySqlConnection con = new MySqlConnection("Server=" + database.DatabaseIP + ";Port=" + database.DatabasePort + ";Database=" + database.DatabaseName + ";Uid=" +
-                "" + database.DatabaseUname + ";Pwd=" + database.DatabasePW + "; ");
+                database.DatabaseUname + ";Pwd=" + database.DatabasePW + ";");
             try
             {
                 con.Open();
@@ -532,6 +532,84 @@ namespace GUISeries
                 con.Close();
                 return false;
             }
+        }
+
+        public bool CheckIfTableExists(Database database)
+        {
+            MySqlConnection con = new MySqlConnection("Server=" + database.DatabaseIP + ";Port=" + database.DatabasePort + ";Database=" + database.DatabaseName + ";Uid=" +
+                database.DatabaseUname + ";Pwd=" + database.DatabasePW + ";");
+            MySqlCommand cmd = new MySqlCommand("SHOW TABLES LIKE 'Series'", con);
+            con.Open();
+            MySqlDataReader reader = cmd.ExecuteReader();
+            List<string> Tables = new List<string>();
+            while(reader.Read())
+            {
+                Tables.Add(reader[0].ToString());
+            }
+            con.Close();
+            if (Tables.Contains("Series"))
+                return true;
+            else
+                return false;
+        }
+
+        public bool CheckIfTableIsValid(Database database)
+        {
+            MySqlConnection con = new MySqlConnection("Server=" + database.DatabaseIP + ";Port=" + database.DatabasePort + ";Database=" + database.DatabaseName + ";Uid=" +
+    database.DatabaseUname + ";Pwd=" + database.DatabasePW + ";");
+            MySqlCommand cmd = new MySqlCommand("SELECT * FROM Series", con);
+
+            con.Open();
+
+            MySqlDataReader reader = cmd.ExecuteReader();
+
+            while(reader.Read())
+            {
+                for(int i = 0; 15 > i; i++)
+                {
+                    try
+                    {
+                        reader[i].ToString();
+                        if(i == 14)
+                        {
+                            try
+                            {
+                                reader[15].ToString();
+                            }
+                            catch
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+            }
+            con.Close();
+            return false;
+        }
+
+        /// <summary>
+        /// THIS WILL OVERWRITE THE CURRENT Series TABLE! If this method is called, it will delete the old table(if it exists) and 
+        /// create a new fresh one. If it doesent already exist, it will just create one
+        /// </summary>
+        public void CreateTable(Database database, string ThisWillDELETEAllDataInSeriesTbl)
+        {
+            MySqlConnection con = new MySqlConnection("Server=" + database.DatabaseIP + ";Port=" + database.DatabasePort + ";Database=" + database.DatabaseName + ";Uid=" +
+database.DatabaseUname + ";Pwd=" + database.DatabasePW + ";");
+            MySqlCommand cmd = new MySqlCommand("DROP TABLE IF EXISTS Series", con);
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+
+            cmd = new MySqlCommand("CREATE TABLE `Series`(`ID` int(11) NOT NULL AUTO_INCREMENT,`Name` mediumtext,`EpisodeCount` int(11) DEFAULT NULL,`AgeRating` varchar(45) DEFAULT NULL,`NSFW` varchar(45) DEFAULT NULL,`Synopsis` mediumtext,`TotalShowLength` int(11) DEFAULT NULL,`Length` int(11) DEFAULT NULL,`EpisodeNumber` int(11) DEFAULT NULL,`SeasonNumber` int(11) DEFAULT NULL,`ShowName` mediumtext,`TimeStamp` datetime DEFAULT NULL,`Genres` text,`Status` tinytext,`UploadTimeStamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY (`ID`)) ENGINE=InnoDB AUTO_INCREMENT=217 DEFAULT CHARSET=utf8;"
+                , con);
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
         }
 
         public string GetConnectionstring()

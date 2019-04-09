@@ -25,6 +25,7 @@ namespace GUISeries
         public static string SettingsPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\Settings.json";
         public static string CheckSeriesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\ToCheck.json";
         public static string LocalSeriesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\Series\\";
+        public static string FuncDatabasesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\FunctionalDatabases.json";
 
         private static void KeepUpdated()
         {
