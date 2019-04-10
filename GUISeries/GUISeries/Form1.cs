@@ -65,16 +65,8 @@ namespace GUISeries
                 File.Create(StaticInfo.FuncDatabasesPath).Close();
 
             SetFunctionalDatabase();
-        }
-
-        bool CheckStrings(List<string> listStrings, params string[] strings)
-        {
-            foreach(string s in strings)
-            {
-                if (!listStrings.Contains(s, StringComparer.CurrentCultureIgnoreCase))
-                    return false;
-            }
-            return true;
+            UpdateTextBoxAutoComplete();
+            SetUploadSuggestions();
         }
 
         List<string> GetSerieNames()
@@ -101,8 +93,6 @@ namespace GUISeries
         private void Form1_Load(object sender, EventArgs e)
         {
             StartupCheck();
-            UpdateTextBoxAutoComplete();
-            SetUploadSuggestions();
         }
 
         void UpdateTextBoxAutoComplete()
@@ -178,7 +168,11 @@ namespace GUISeries
             //listView1.Items.Add("you", "you", "you");
 
             //This is needed incase the user tries to select multiple series and press ENTER, you can only upload one serie at a time. 
-
+            if(StaticInfo.CurrentDatabase == null)
+            {
+                MessageBox.Show("There doesent seem to be a functional database configured. Please configure one and try again.");
+                return;
+            }
             if (string.IsNullOrWhiteSpace(StaticInfo.CurrentDatabase.DatabaseName))
             {
                 MessageBox.Show("There doesent seem to be a functional database configured. Please configure one and try again.");
@@ -198,22 +192,6 @@ namespace GUISeries
             CLSerie serie = currentList.Find(x => x.name == lstView_SeriesFromAPI.SelectedItems[0].Name);
             AddSeries addSeries = new AddSeries(serie);
             addSeries.ShowDialog();
-            ConfigurationManager manager = new ConfigurationManager();
-            List<Database> databases = manager.GetFunctionalDatabases();
-            if(databases.Count > 0)
-            {
-                Database database = databases.Find(x => x.DefaultDB == true);
-                if (!string.IsNullOrWhiteSpace(database.DatabaseUname))
-                {
-                    StaticInfo.CurrentDatabase = database;
-                    lbl_CurrentDatabase.Text = "Current database: " + database.DatabaseName;
-                }
-                else
-                {
-                    StaticInfo.CurrentDatabase = databases[0];
-                    lbl_CurrentDatabase.Text = "Current database " + databases[0].DatabaseName;
-                }
-            }
         }
 
         private void btn_ConfirmSearch_Click(object sender, EventArgs e)

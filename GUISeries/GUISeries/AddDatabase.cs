@@ -45,110 +45,116 @@ namespace GUISeries
                 DatabasePW = txt_DBPW.Text,
                 DatabaseUname = txt_DBUname.Text
             };
-
             if (chckBx_DefaultDB.Checked)
-            {
                 database.DefaultDB = true;
-                List<Database> databases = manager.GetDatabases();
-                if(databases.Count > 0)
-                {
-                    int Index = databases.FindIndex(x => x.DefaultDB == true);
-                    if(Index != -1)
-                    {
-                        DialogResult ChangeDefaultDB = MessageBox.Show("A default database already exists, do you want to make this database the new default database?", "Change default database?", MessageBoxButtons.YesNo);
-                        if(ChangeDefaultDB == DialogResult.Yes)
-                        {
-                            databases[Index].DefaultDB = false;
-                            databases.Add(database);
-                            manager.OverWriteDatabases(databases, StaticInfo.DatabaseConfPath);
-                            ConfirmDatabase(database);
-                            this.Close();
-                            return;//return since this.close does not stop method execution
-                        }
-                    }
-                }
-            }
             else
                 database.DefaultDB = false;
-
-            int result = manager.AddDatabase(database);
-            
-            if (result == 1)
+            if (!manager.CheckDatabaseConnection(database))
             {
-                MessageBox.Show("This database already exists");
-                return;
-            }
-            else if (result == 0)
-            {
-                ConfirmDatabase(database);
-                /*this.*/Close();
-                return;
-            }
-        }
-
-        /// <summary>
-        /// I need to check if the database is valid if another default database exists and if it doesent. So instead of coding this twice, i just made a function for it. 
-        /// I will probably restructure this later so that it makes more sense. Which is why im setting a bookmark here
-        /// </summary>
-        /// <param name="database"></param>
-        void ConfirmDatabase(Database database)
-        {
-            ConfigurationManager manager = new ConfigurationManager();
-
-            bool Connectable = manager.CheckDatabaseConnection(database);
-            if (!Connectable)
-            {
-                DialogResult ConnectableResult = MessageBox.Show("Cannot connect to the database, do you wish to keep the database?", "Unable to connect to the database", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                if (ConnectableResult == DialogResult.No)
+                DialogResult CantConnect = MessageBox.Show("Cannot connect to this database, do you want to keep it? You will have to attempt " +
+                    "to reconfigure it later. If you believe the information is right, please check your internet connection and " +
+                    "try again.", "Keep this database?", MessageBoxButtons.YesNo);
+                if(CantConnect == DialogResult.Yes)
                 {
-                    manager.RemoveDatabase(database);
-                    MessageBox.Show("Database removed succsessfully");
+                    int resultInt = manager.AddDatabase(database);
+                    if (resultInt == 1)
+                    {
+                        MessageBox.Show("This database already exists", "The database already exists");
+                        return;
+                    }
+                    else if(resultInt == 0)
+                    {
+                        MessageBox.Show("Database added succsessfully, however, you may not use this database before you configure it in " +
+                            "Configuration>Fix Databases");
+                        this.Close();
+                        return;
+                    }
+                }
+                else
+                {
+                    return;
                 }
             }
             else
             {
                 if(!manager.CheckIfTableExists(database))
                 {
+                    CheckDefault(database);
                     manager.CreateTable(database, "");
+                    manager.AddDatabase(database);
+                    manager.AddFuncDBToFile(database);
+                    MessageBox.Show("Database added sucsessfully", "Sucsess");
+                    UseDatabase(database);
+                    this.Close();
+                    return;
                 }
                 else
                 {
-                    if(!manager.CheckIfTableIsValid(database))
+                    bool valid = manager.CheckIfTableIsValid(database);
+                    if(valid)
                     {
-                        DialogResult OverwriteDB = MessageBox.Show("It seems like you already have a Series table in your database and it seems uncompatible with this program. Click " +
-                            "yes if you want to delete it and create a new one that works with this program, click no if you want to take a backup first " +
-                            "or use another database.", "Overwrite current database?", MessageBoxButtons.YesNoCancel);
-                        if (OverwriteDB == DialogResult.Yes)
-                        {
-                            DialogResult Confirm = MessageBox.Show("Overwriting the current Series table with a fresh table...", "Are you sure?",
-                                MessageBoxButtons.YesNoCancel);
-                            if (Confirm == DialogResult.Yes)
-                            {
-                                manager.CreateTable(database, "");
-                                List<Database> FuncDBToFile = new List<Database>();
-                                string jsonstring = File.ReadAllText(StaticInfo.FuncDatabasesPath);
-                                if (!string.IsNullOrWhiteSpace(jsonstring))
-                                {
-                                    FuncDBToFile = manager.GetDBFromJsonString(jsonstring);
-                                }
-                                FuncDBToFile.Add(database);
-
-                                manager.OverWriteDatabases(FuncDBToFile, StaticInfo.FuncDatabasesPath);
-                            }
-                        }
+                        CheckDefault(database);
+                        manager.AddDatabase(database);
+                        manager.AddFuncDBToFile(database);
+                        MessageBox.Show("Database added sucsessfully", "Sucsess");
+                        UseDatabase(database);
+                        this.Close();
+                        return;
                     }
                     else
                     {
-                        List<Database> FuncDBToFile = manager.GetDBFromJsonString(File.ReadAllText(StaticInfo.FuncDatabasesPath));
-
-                        FuncDBToFile.Add(database);
-
-                        manager.OverWriteDatabases(FuncDBToFile, StaticInfo.FuncDatabasesPath);
+                        DialogResult OverWrite = MessageBox.Show("It seems that the database provided contains a table called 'Series' that is incompatible with this program. " +
+                            "You will need to backup and delete it and then try again. Or this program could overwrite it for you, clicking yes will make " +
+                            "the program overwrite the current 'Series' table in the database " + database.DatabaseName,"Overwrite Series table?", 
+                            MessageBoxButtons.YesNoCancel);
+                        if(OverWrite == DialogResult.Yes)
+                        {
+                            DialogResult Confirm = MessageBox.Show("Clicking yes will delete ALL data inside of table 'Series' in database " + database.DatabaseName + " " +
+                                "and make it compatible with this program, proceed?", "Are you sure?", MessageBoxButtons.YesNoCancel);
+                            if(Confirm == DialogResult.Yes)
+                            {
+                                CheckDefault(database);
+                                manager.CreateTable(database, "");
+                                manager.AddDatabase(database);
+                                manager.AddFuncDBToFile(database);
+                                MessageBox.Show("Sucsessfully added the database", "Sucsess!");
+                                UseDatabase(database);
+                                this.Close();
+                                return;
+                            }
+                        }
                     }
                 }
-                DialogResult result = MessageBox.Show("Do you wish to use this database?", "Use database?", MessageBoxButtons.YesNo);
-                if (result == DialogResult.Yes)
-                    StaticInfo.CurrentDatabase = database;
+            }
+
+        }
+
+        void UseDatabase(Database database)
+        {
+            DialogResult result = MessageBox.Show("Do you wish to use this database now?", "Use the database", MessageBoxButtons.YesNo);
+            if(result == DialogResult.Yes)
+            {
+                StaticInfo.CurrentDatabase = database;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="database"></param>
+        void CheckDefault(Database database)
+        {
+            ConfigurationManager manager = new ConfigurationManager();
+            List<Database> databases = manager.GetAllInFunctionalDBFile();
+            Database DefaultDB = databases.Find(x => x.DefaultDB);
+            if(DefaultDB != null)
+            {
+                DialogResult result = MessageBox.Show("Det ser ut til at en annen standard/default database allerede finnes, vil du gjøre denne til den nye standar " +
+                    "databasen", "Sette denne til default database?", MessageBoxButtons.YesNo);
+                if(result == DialogResult.Yes)
+                {
+                    manager.SetDefaultDB(database);
+                }
             }
         }
 

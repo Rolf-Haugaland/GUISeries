@@ -263,11 +263,12 @@ namespace GUISeries
 
         /// <summary>
         /// Sets the default database to the database provided. Also sets the previous default database to no longer be a default database.
+        /// Only takes FunctionalDatabases.json into consideration.
         /// </summary>
         /// <param name="database"></param>
         public void SetDefaultDB(Database database)
         {
-            List<Database> databases = GetDatabases();
+            List<Database> databases = GetAllInFunctionalDBFile();
             List<Database> defaultDB = databases.FindAll(x => x.DefaultDB);
             if (databases.Count > 1)//Arguabely bad error handeling, will look into prompting the user to resolve this later, but the exam is closing in, it is not priority work.
                 throw new Exception("SetDefaultDB found that there exists more than 1 default database, this is not supposed to happen");
@@ -297,7 +298,7 @@ namespace GUISeries
                     database.DefaultDB = true;
 
                     databases.Add(database);
-
+                    OverWriteDatabases(databases, StaticInfo.FuncDatabasesPath);
                 }
                 else//Futile return
                     return;
@@ -422,7 +423,7 @@ namespace GUISeries
         public void RemoveDatabase(Database database)
         {
             List<Database> databases = new List<Database>();
-            string currentDatabases = File.ReadAllText(StaticInfo.DatabaseConfPath);
+            string currentDatabases = File.ReadAllText(StaticInfo.FuncDatabasesPath);
             if (!string.IsNullOrWhiteSpace(currentDatabases))
                 databases = GetDBFromJsonString(currentDatabases);
             //Loops through all the databases to find the one to remove. Once it is found it removes it and stops the function.
@@ -431,7 +432,7 @@ namespace GUISeries
                 if (DatabaseCheckEqual(databases[i], database))
                 {
                     databases.RemoveAt(i);
-                    OverWriteDatabases(databases, StaticInfo.DatabaseConfPath);
+                    OverWriteDatabases(databases, StaticInfo.FuncDatabasesPath);
                     return;
                 }
             }
@@ -496,7 +497,15 @@ namespace GUISeries
         /// <returns>All functional databases in Settings.txt. Default DB at start of list. Returns new List<Database> if none are found</returns>
         public List<Database> GetFunctionalDatabases()
         {
-            List<Database> databases = GetDatabases();
+            List<Database> databases = new List<Database>();
+
+            string allDatabases = File.ReadAllText(StaticInfo.FuncDatabasesPath);
+
+            if (!string.IsNullOrWhiteSpace(allDatabases))
+            {
+                databases = GetDBFromJsonString(allDatabases);
+            }
+
             List<Database> CheckedDB = new List<Database>();
             foreach (Database database in databases)
             {
@@ -510,6 +519,25 @@ namespace GUISeries
                 CheckedDB.Insert(0, DefaultDB);
             }
             return CheckedDB;
+        }
+
+        public List<Database> GetAllInFunctionalDBFile()
+        {
+            List<Database> databases = new List<Database>();
+
+            string allDatabases = File.ReadAllText(StaticInfo.FuncDatabasesPath);
+
+            if (!string.IsNullOrWhiteSpace(allDatabases))
+            {
+                databases = GetDBFromJsonString(allDatabases);
+            }
+            Database DefaultDB = databases.Find(x => x.DefaultDB == true);
+            if (DefaultDB != null)
+            {
+                databases.Remove(DefaultDB);
+                databases.Insert(0, DefaultDB);
+            }
+            return databases;
         }
 
         /// <summary>
@@ -589,7 +617,7 @@ namespace GUISeries
                 }
             }
             con.Close();
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -623,6 +651,19 @@ database.DatabaseUname + ";Pwd=" + database.DatabasePW + ";");
                     return "";
             else
                 return "";
+        }
+
+        public void AddFuncDBToFile(Database database)
+        {
+            List<Database> FuncDBToFile = new List<Database>();
+            string jsonstring = File.ReadAllText(StaticInfo.FuncDatabasesPath);
+            if (!string.IsNullOrWhiteSpace(jsonstring))
+            {
+                FuncDBToFile = GetDBFromJsonString(jsonstring);
+            }
+            FuncDBToFile.Add(database);
+
+            OverWriteDatabases(FuncDBToFile, StaticInfo.FuncDatabasesPath);
         }
     }
 }

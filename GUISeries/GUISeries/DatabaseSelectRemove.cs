@@ -46,7 +46,7 @@ namespace GUISeries
                     if (result == DialogResult.Yes)
                     {
                         databases.Remove(database);
-                        manager.OverWriteDatabases(databases, StaticInfo.DatabaseConfPath);
+                        manager.OverWriteDatabases(databases, StaticInfo.FuncDatabasesPath);
                         if (manager.DatabaseCheckEqual(database, StaticInfo.CurrentDatabase))
                         {
                             DialogResult SetFunctional = MessageBox.Show("You just removed the database that was currently being used. Do you wish to set another functional database?", "Current " +
@@ -100,7 +100,7 @@ namespace GUISeries
         void UpdateLstBx()
         {
             ConfigurationManager manager = new ConfigurationManager();
-            databases = manager.GetDatabases();
+            databases = manager.GetAllInFunctionalDBFile();
             lstBx_Databases.Items.Clear();
             foreach (Database db in databases)
             {
