@@ -63,6 +63,8 @@ namespace GUISeries
                 File.Create(StaticInfo.CheckSeriesPath).Close();
             if (!File.Exists(StaticInfo.FuncDatabasesPath))
                 File.Create(StaticInfo.FuncDatabasesPath).Close();
+            if (!File.Exists(StaticInfo.NonFuncDatabasesPath))
+                File.Create(StaticInfo.NonFuncDatabasesPath).Close();
 
             SetFunctionalDatabase();
             UpdateTextBoxAutoComplete();
@@ -135,7 +137,8 @@ namespace GUISeries
             ConfigurationManager manager = new ConfigurationManager();
             MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
             MySqlCommand cmd = new MySqlCommand("select distinct ShowName from (Select * from Series order by UploadTimeStamp) as s limit 10", con);
-
+            if (StaticInfo.CurrentDatabase == null)
+                return;
             con.Open();
             MySqlDataReader reader = cmd.ExecuteReader();
             List<string> shows = new List<string>();
@@ -277,8 +280,17 @@ namespace GUISeries
 
         private void mnStrp_LatestEpsWatched_Click(object sender, EventArgs e)
         {
-            LatestWatched latestWatched = new LatestWatched();
-            latestWatched.ShowDialog();
+            if(StaticInfo.CurrentDatabase != null)
+            {
+                LatestWatched latestWatched = new LatestWatched();
+                latestWatched.ShowDialog();
+            }
+        }
+
+        private void mnStrp_RepairDB_Click(object sender, EventArgs e)
+        {
+            RepairDB repair = new RepairDB();
+            repair.ShowDialog();
         }
     }
 }

@@ -45,22 +45,34 @@ namespace GUISeries
             List<string> boolFromDB = new List<string>();
             while (reader.Read())
             {
-                WholeHistory.Add(new CLSerie()
+                CLSerie serie = new CLSerie()
                 {
-                    DBID = Convert.ToInt32(reader["id"].ToString()),
                     episodeName = reader["Name"].ToString(),
-                    episodeCount = Convert.ToInt32(reader["EpisodeCount"].ToString()),
                     ageRating = reader["AgeRating"].ToString(),
                     synopsis = reader["Synopsis"].ToString(),
-                    totalLength = Convert.ToInt32(reader["TotalShowLength"].ToString()),
-                    length = Convert.ToInt32(reader["Length"].ToString()),
-                    EpisodeNumber = Convert.ToInt32(reader["EpisodeNumber"]),
                     seasonNumber = reader["SeasonNumber"].ToString(),
                     showName = reader["ShowName"].ToString(),
-                    TimeStamp = Convert.ToDateTime(reader["TimeStamp"]),
-                    status = reader["Status"].ToString(),
                     genres = reader["Genres"].ToString().Split(',').ToList()
-                });
+                };
+                if (int.TryParse(reader["id"].ToString(), out int DBID))
+                    serie.DBID = DBID;
+
+                if (int.TryParse(reader["EpisodeCount"].ToString(), out int EPCount))
+                    serie.episodeCount = EPCount;
+
+                if (int.TryParse(reader["TotalShowLength"].ToString(), out int TotShowLength))
+                    serie.totalLength = TotShowLength;
+
+                if (int.TryParse(reader["Length"].ToString(), out int EpLength))
+                    serie.length = EpLength;
+
+                if (int.TryParse(reader["EpisodeNumber"].ToString(), out int EpNum))
+                    serie.EpisodeNumber = EpNum;
+
+                if (DateTime.TryParse(reader["TimeStamp"].ToString(), out DateTime TimeStamp))
+                    serie.TimeStamp = TimeStamp;
+
+                WholeHistory.Add(serie);
                 boolFromDB.Add(reader["NSFW"].ToString());
             }
             //Change it so that there is a button to use all episodes, not just current date. This will unlock abillity to sort the items from 1 
@@ -68,10 +80,10 @@ namespace GUISeries
             con.Close();
             for (int i = 0; WholeHistory.Count > i; i++)
             {
-                if (boolFromDB[i] == "0")
-                    WholeHistory[i].NSFW = false;
-                else
+                if (boolFromDB[i] == "1")
                     WholeHistory[i].NSFW = true;
+                else
+                    WholeHistory[i].NSFW = false;
             }
 
             List<ListViewItem> items = new List<ListViewItem>();

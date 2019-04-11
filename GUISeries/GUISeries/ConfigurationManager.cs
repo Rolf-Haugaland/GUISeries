@@ -42,17 +42,6 @@ namespace GUISeries
         /// working or not. GetFunctionalDatabases() only returns functional databases
         /// </summary>
         /// <returns>All databases in the Settings.txt file, connectable or not</returns>
-        public List<Database> GetDatabases()
-        {
-            string allDatabases = File.ReadAllText(StaticInfo.DatabaseConfPath);
-
-            if (!string.IsNullOrWhiteSpace(allDatabases))
-            {
-                return GetDBFromJsonString(allDatabases);
-            }
-
-            return new List<Database>();
-        }
 
         public List<CLSerie> GetSeries(string SearchQuery)
         {
@@ -266,11 +255,11 @@ namespace GUISeries
         /// Only takes FunctionalDatabases.json into consideration.
         /// </summary>
         /// <param name="database"></param>
-        public void SetDefaultDB(Database database)
+        private void SetDefaultDB(Database database, string DBFilePath)
         {
-            List<Database> databases = GetAllInFunctionalDBFile();
+            List<Database> databases = GetDBFromFile(DBFilePath);
             List<Database> defaultDB = databases.FindAll(x => x.DefaultDB);
-            if (databases.Count > 1)//Arguabely bad error handeling, will look into prompting the user to resolve this later, but the exam is closing in, it is not priority work.
+            if (defaultDB.Count > 1)//Arguabely bad error handeling, will look into prompting the user to resolve this later, but the exam is closing in, it is not priority work.
                 throw new Exception("SetDefaultDB found that there exists more than 1 default database, this is not supposed to happen");
             else if (defaultDB.Count == 1)
             {
@@ -298,11 +287,31 @@ namespace GUISeries
                     database.DefaultDB = true;
 
                     databases.Add(database);
-                    OverWriteDatabases(databases, StaticInfo.FuncDatabasesPath);
+                    OverWriteDatabases(databases, DBFilePath);
                 }
                 else//Futile return
                     return;
             }
+            else if (defaultDB.Count == 0)
+            {
+                for(int i = 0; databases.Count > i; i++)
+                {
+                    if(DatabaseCheckEqual(databases[i], database))
+                    {
+                        databases.RemoveAt(i);
+                    }
+                }
+                database.DefaultDB = true;
+                databases.Add(database);
+                OverWriteDatabases(databases, DBFilePath);
+            }
+        }
+
+        public void ChangeDefaultDB(Database database)
+        {
+            SetDefaultDB(database, StaticInfo.NonFuncDatabasesPath);
+            SetDefaultDB(database, StaticInfo.FuncDatabasesPath);
+            SetDefaultDB(database, StaticInfo.DatabaseConfPath);
         }
 
         public List<CLEpisode> GetEpisodes(CLSerie serie, int startEpisode, int endEpisode)
@@ -420,10 +429,10 @@ namespace GUISeries
             File.WriteAllText(path, data);
         }
 
-        public void RemoveDatabase(Database database)
+        public void RemoveDatabase(Database database, string path)
         {
             List<Database> databases = new List<Database>();
-            string currentDatabases = File.ReadAllText(StaticInfo.FuncDatabasesPath);
+            string currentDatabases = File.ReadAllText(path);
             if (!string.IsNullOrWhiteSpace(currentDatabases))
                 databases = GetDBFromJsonString(currentDatabases);
             //Loops through all the databases to find the one to remove. Once it is found it removes it and stops the function.
@@ -432,7 +441,7 @@ namespace GUISeries
                 if (DatabaseCheckEqual(databases[i], database))
                 {
                     databases.RemoveAt(i);
-                    OverWriteDatabases(databases, StaticInfo.FuncDatabasesPath);
+                    OverWriteDatabases(databases, path);
                     return;
                 }
             }
@@ -464,6 +473,35 @@ namespace GUISeries
 
             string data = Newtonsoft.Json.JsonConvert.SerializeObject(databases);
             File.WriteAllText(StaticInfo.DatabaseConfPath, data);
+            return 0;
+        }
+
+        public int AddNonFuncDB(Database database)
+        {
+            //The list that will be written to the file
+            List<Database> databases = new List<Database>();
+
+            string currentDatabases = File.ReadAllText(StaticInfo.NonFuncDatabasesPath);
+            if (!string.IsNullOrWhiteSpace(currentDatabases))
+            {
+                databases = GetDBFromJsonString(currentDatabases);
+            }
+
+            databases.Add(database);
+
+            //If there are more than 1 databases in the databases list that means there is already(at least) one database and the user is adding another one
+            if (databases.Count > 1)
+            {
+                //This loop checks each and every element in the databases and if it is a duplicate it returns 1, which indicates failure due to duplicate database
+                for (int i = 0; databases.Count - 1 > i; i++)
+                {
+                    if (DatabaseCheckEqual(databases[i], databases.Last()))
+                        return 1;
+                }
+            }
+
+            string data = Newtonsoft.Json.JsonConvert.SerializeObject(databases);
+            File.WriteAllText(StaticInfo.NonFuncDatabasesPath, data);
             return 0;
         }
 
@@ -521,11 +559,11 @@ namespace GUISeries
             return CheckedDB;
         }
 
-        public List<Database> GetAllInFunctionalDBFile()
+        public List<Database> GetDBFromFile(string path)
         {
             List<Database> databases = new List<Database>();
 
-            string allDatabases = File.ReadAllText(StaticInfo.FuncDatabasesPath);
+            string allDatabases = File.ReadAllText(path);
 
             if (!string.IsNullOrWhiteSpace(allDatabases))
             {
@@ -548,7 +586,7 @@ namespace GUISeries
         public bool CheckDatabaseConnection(Database database)
         {
             MySqlConnection con = new MySqlConnection("Server=" + database.DatabaseIP + ";Port=" + database.DatabasePort + ";Database=" + database.DatabaseName + ";Uid=" +
-                database.DatabaseUname + ";Pwd=" + database.DatabasePW + ";");
+                database.DatabaseUname + ";Pwd=" + database.DatabasePW + ";connection timeout=2;");
             try
             {
                 con.Open();

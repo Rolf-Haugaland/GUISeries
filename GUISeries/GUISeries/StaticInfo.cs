@@ -26,10 +26,10 @@ namespace GUISeries
         public static string CheckSeriesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\ToCheck.json";
         public static string LocalSeriesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\Series\\";
         public static string FuncDatabasesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\FunctionalDatabases.json";
+        public static string NonFuncDatabasesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\NonFunctionalDatabases.json";
 
         private static void KeepUpdated()
         {
-
             bool first = true;
         loop:
             if(!first)
@@ -154,10 +154,13 @@ namespace GUISeries
                     string NameFromAPI = JONameFromAPI2.SelectToken("attributes.canonicalTitle").ToString();
                     if (NameFromFile == NameFromAPI)
                     {
+                        File.WriteAllText(FolderPath + "Series\\" + NameFromAPI + ".json", JONameFromAPI2.ToString());
                         string status = JONameFromAPI2.SelectToken("attributes.status").ToString();
-                        if (status == "finished")
+                        if (status == "Finished")
                         {
-                            File.WriteAllText(FolderPath + "Series\\" + NameFromAPI + ".json", JONameFromAPI2.ToString());
+                            string jsonstr = File.ReadAllText(CheckSeriesPath);
+                            var x = JsonConvert.DeserializeObject(jsonstr);
+                            //remove and write to file
                         }
                     }
                 }

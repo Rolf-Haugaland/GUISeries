@@ -45,26 +45,51 @@ namespace GUISeries
     "Database IP: '" + database.DatabaseIP + "' Database Port: '" + database.DatabasePort + "'", "Remove the selected database?", MessageBoxButtons.YesNoCancel);
                     if (result == DialogResult.Yes)
                     {
-                        databases.Remove(database);
-                        manager.OverWriteDatabases(databases, StaticInfo.FuncDatabasesPath);
-                        if (manager.DatabaseCheckEqual(database, StaticInfo.CurrentDatabase))
+                        try
                         {
-                            DialogResult SetFunctional = MessageBox.Show("You just removed the database that was currently being used. Do you wish to set another functional database?", "Current " +
-                                "database was removed", MessageBoxButtons.YesNo);
-                            if(SetFunctional == DialogResult.Yes)
+                            manager.RemoveDatabase(database, StaticInfo.NonFuncDatabasesPath);
+                        }
+                        catch
+                        {
+
+                        }
+                        try
+                        {
+                            manager.RemoveDatabase(database, StaticInfo.FuncDatabasesPath);
+                        }
+                        catch
+                        {
+
+                        }
+                        try
+                        {
+                            manager.RemoveDatabase(database, StaticInfo.DatabaseConfPath);
+                        }
+                        catch
+                        {
+
+                        }
+                        if(StaticInfo.CurrentDatabase != null)
+                        {
+                            if (manager.DatabaseCheckEqual(database, StaticInfo.CurrentDatabase))
                             {
-                                List<Database> FuncDatabases = manager.GetFunctionalDatabases();
-                                if (FuncDatabases.Count > 0)
-                                    StaticInfo.CurrentDatabase = FuncDatabases[0];
+                                DialogResult SetFunctional = MessageBox.Show("You just removed the database that was currently being used. Do you wish to set another functional database?", "Current " +
+                                    "database was removed", MessageBoxButtons.YesNo);
+                                if (SetFunctional == DialogResult.Yes)
+                                {
+                                    List<Database> FuncDatabases = manager.GetFunctionalDatabases();
+                                    if (FuncDatabases.Count > 0)
+                                        StaticInfo.CurrentDatabase = FuncDatabases[0];
+                                    else
+                                    {
+                                        StaticInfo.CurrentDatabase = null;
+                                        MessageBox.Show("Did not find a functional database, please add one in Configuration>Add Database");
+                                    }
+                                }
                                 else
                                 {
                                     StaticInfo.CurrentDatabase = null;
-                                    MessageBox.Show("Did not find a functional database, please add one in Configuration>Add Database");
                                 }
-                            }
-                            else
-                            {
-                                StaticInfo.CurrentDatabase = null;
                             }
                         }
                         this.Close();
@@ -78,7 +103,8 @@ namespace GUISeries
                 }
                 else if(Action == "ChangeDefaultDatabase")
                 {
-                    manager.SetDefaultDB(database);
+                    database = databases.Find(x => x.DatabaseName == lstBx_Databases.SelectedItem.ToString());
+                    manager.ChangeDefaultDB(database);
                     MessageBox.Show("New default database set, database IP: " + database.DatabaseIP + " database name: " + database.DatabasePort + " database name: " + database.DatabaseName);
                     this.Close();
                 }
@@ -100,7 +126,7 @@ namespace GUISeries
         void UpdateLstBx()
         {
             ConfigurationManager manager = new ConfigurationManager();
-            databases = manager.GetAllInFunctionalDBFile();
+            databases = manager.GetDBFromFile(StaticInfo.DatabaseConfPath);
             lstBx_Databases.Items.Clear();
             foreach (Database db in databases)
             {

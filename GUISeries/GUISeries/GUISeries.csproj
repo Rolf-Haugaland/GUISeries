@@ -99,6 +99,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ConfigurationManager.cs" />
+    <Compile Include="RepairDB.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RepairDB.Designer.cs">
+      <DependentUpon>RepairDB.cs</DependentUpon>
+    </Compile>
     <Compile Include="StaticInfo.cs" />
     <EmbeddedResource Include="AddSeries.resx">
       <DependentUpon>AddSeries.cs</DependentUpon>
@@ -128,6 +134,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="RepairDB.resx">
+      <DependentUpon>RepairDB.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

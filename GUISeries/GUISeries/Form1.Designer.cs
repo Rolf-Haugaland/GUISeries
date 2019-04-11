@@ -42,6 +42,7 @@
             this.lbl_CurrentDatabase = new System.Windows.Forms.Label();
             this.lstVw_UploadSuggestions = new System.Windows.Forms.ListView();
             this.label1 = new System.Windows.Forms.Label();
+            this.mnStrp_RepairDB = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -96,7 +97,8 @@
             this.configureChangeDatabaseToolStripMenuItem,
             this.removeDatabaseToolStripMenuItem,
             this.setDatabaseToolStripMenuItem,
-            this.changeDefaultDatabaseToolStripMenuItem});
+            this.changeDefaultDatabaseToolStripMenuItem,
+            this.mnStrp_RepairDB});
             this.configurationToolStripMenuItem.Name = "configurationToolStripMenuItem";
             this.configurationToolStripMenuItem.Size = new System.Drawing.Size(93, 20);
             this.configurationToolStripMenuItem.Text = "Configuration";
@@ -176,6 +178,13 @@
             this.label1.Text = "Upload suggestions: (Have like naruto episode 5 here, if the user has watched epi" +
     "sode 4)";
             // 
+            // mnStrp_RepairDB
+            // 
+            this.mnStrp_RepairDB.Name = "mnStrp_RepairDB";
+            this.mnStrp_RepairDB.Size = new System.Drawing.Size(205, 22);
+            this.mnStrp_RepairDB.Text = "Configure database";
+            this.mnStrp_RepairDB.Click += new System.EventHandler(this.mnStrp_RepairDB_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -216,6 +225,7 @@
         private System.Windows.Forms.ToolStripMenuItem changeDefaultDatabaseToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem myDataToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem latestEpisodeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem mnStrp_RepairDB;
     }
 }
 

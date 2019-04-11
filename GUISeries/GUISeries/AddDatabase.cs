@@ -66,6 +66,7 @@ namespace GUISeries
                     {
                         MessageBox.Show("Database added succsessfully, however, you may not use this database before you configure it in " +
                             "Configuration>Fix Databases");
+                        manager.AddNonFuncDB(database);
                         this.Close();
                         return;
                     }
@@ -145,7 +146,7 @@ namespace GUISeries
         void CheckDefault(Database database)
         {
             ConfigurationManager manager = new ConfigurationManager();
-            List<Database> databases = manager.GetAllInFunctionalDBFile();
+            List<Database> databases = manager.GetDBFromFile(StaticInfo.DatabaseConfPath);
             Database DefaultDB = databases.Find(x => x.DefaultDB);
             if(DefaultDB != null)
             {
@@ -153,7 +154,7 @@ namespace GUISeries
                     "databasen", "Sette denne til default database?", MessageBoxButtons.YesNo);
                 if(result == DialogResult.Yes)
                 {
-                    manager.SetDefaultDB(database);
+                    manager.ChangeDefaultDB(database);
                 }
             }
         }
