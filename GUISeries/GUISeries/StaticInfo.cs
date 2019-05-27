@@ -36,7 +36,7 @@ namespace GUISeries
             bool first = true;
         loop:
             if(!first)
-                Thread.Sleep(TimeSpan.FromMinutes(2));
+                Thread.Sleep(TimeSpan.FromMinutes(60));
             first = false;
             DateTime lastCheck = new DateTime();
             if (!File.Exists(FolderPath + "LastCheck.txt"))
@@ -50,7 +50,7 @@ namespace GUISeries
             if (lastCheck < DateTime.Now.AddDays(-1))
             {
                 UpdateFiles();
-                //UpdateDB(); a few functions needs to be updated. You dont nessecarily need to get a finisehd series since the data will update weekly.
+                UpdateDB();// a few functions needs to be updated. You dont nessecarily need to get a finisehd series since the data will update weekly.
                 //So you want it to update daily from the API, not wait all the way until it is finished. Also configurationmanager.UpdateDBEntry(CLSerie) is not finished. 
             }
             else
@@ -60,7 +60,7 @@ namespace GUISeries
         /// <summary>
         /// Pulls episodes that has a status that is not finished from the database and checks if there is an updated version and updates them.
         /// </summary>
-        private static void UpdateDB(string NOTREADY)
+        private static void UpdateDB()//string NOTREADY)
         {
         loop2:
             Thread.Sleep(100);
@@ -80,23 +80,30 @@ namespace GUISeries
                 CLSerie OutdatedEpisode = new CLSerie()
                 {
                     episodeName = reader["Name"].ToString(),
-                    episodeCount = (int)reader["EpisodeCount"],
+                    episodeCount = ImprovedIntTryParse(reader["EpisodeCount"].ToString()),
                     ageRating = reader["AgeRating"].ToString(),
-                    NSFW = Convert.ToBoolean(reader["NSFW"]),
                     synopsis = reader["Synopsis"].ToString(),
-                    totalLength = (int)reader["TotalShowLength"],
-                    length = (int)reader["Length"],
-                    EpisodeNumber = (int)reader["EpisodeNumber"],
+                    totalLength = ImprovedIntTryParse(reader["TotalShowLength"].ToString()),
+                    length = ImprovedIntTryParse(reader["Length"].ToString()),
+                    EpisodeNumber = ImprovedIntTryParse(reader["EpisodeNumber"].ToString()),
                     seasonNumber = reader["SeasonNumber"].ToString(),
                     showName = reader["ShowName"].ToString(),
                     genres = reader["Genres"].ToString().Split(',').ToList(),
                     name = reader["ShowName"].ToString(),
-                    DBID = (int)reader["ID"]
+                    DBID = (int)reader["ID"],//this is the database ID, it wont ever be null because of how mysql works. 
                 };
+
+                if (reader["NSFW"].ToString() == "1")
+                {
+                    OutdatedEpisode.NSFW = true;
+                }
+                else
+                {
+                    OutdatedEpisode.NSFW = false;
+                }
                 OutdatedEpisodes.Add(OutdatedEpisode);
             }
             con.Close();
-            OutdatedEpisodes.RemoveAll(x => x.status != "finished");
             if (OutdatedEpisodes.Count == 0)
                 return;
 
@@ -109,6 +116,20 @@ namespace GUISeries
                     manager.UpdateDBEntry(Finished);
                 }
             }
+        }
+
+        /// <summary>
+        /// Since the int.tryparse does not return an integer i thuoght it would be more practical and less clumsy to make my own function that functions like an int.tryparse 
+        /// but also returns an integer(based on int.tryparse, but it also returns the value)
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        private static int? ImprovedIntTryParse(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return null;
+            int.TryParse(s, out int result);
+            return result;
         }
 
         /// <summary>
