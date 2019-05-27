@@ -22,32 +22,7 @@ namespace GUISeries
             InitializeComponent();
         }
 
-        List<CLSerie> currentList = new List<CLSerie>();
-
-        void SetFunctionalDatabase()
-        {
-            ConfigurationManager manager = new ConfigurationManager();
-            List<Database> databases = manager.GetFunctionalDatabases();
-
-            if (databases.Count == 0)
-            {
-                DialogResult result = MessageBox.Show("Det ser ikke ut at du har lagt til en funksjonell database enda, vil du gjøre det nå?", "Konfigurere database?", MessageBoxButtons.YesNo);
-                if (result == DialogResult.Yes)
-                {
-                    AddDatabase databaseConfiguration = new AddDatabase();
-                    databaseConfiguration.ShowDialog();
-                    SetFunctionalDatabase();
-                }
-                else if (result == DialogResult.No)
-                    lbl_CurrentDatabase.Text = "Current database: No functional database found";
-            }
-            else if(databases.Count >= 1)
-            {
-                StaticInfo.CurrentDatabase = databases[0];
-                lbl_CurrentDatabase.Text = "Current database: " + StaticInfo.CurrentDatabase.DatabaseName;
-            }
-        }
-
+        //All the things that happen on startup
         void StartupCheck()
         {
             //Creates the nessecary files and folders
@@ -71,14 +46,106 @@ namespace GUISeries
             SetUploadSuggestions();
         }
 
+        void SetFunctionalDatabase()
+        {
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
+            List<Database> databases = dbconf.GetFunctionalDatabases();
+
+            if (databases.Count == 0)
+            {
+                DialogResult result = MessageBox.Show("Det ser ikke ut at du har lagt til en funksjonell database enda, vil du gjøre det nå?", "Konfigurere database?", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    AddDatabase databaseConfiguration = new AddDatabase();
+                    databaseConfiguration.ShowDialog();
+                    SetFunctionalDatabase();
+                }
+                else if (result == DialogResult.No)
+                    lbl_CurrentDatabase.Text = "Current database: No functional database found";
+            }
+            else if(databases.Count >= 1)
+            {
+                StaticInfo.CurrentDatabase = databases[0];
+                lbl_CurrentDatabase.Text = "Current database: " + StaticInfo.CurrentDatabase.DatabaseName;
+            }
+        }
+
+        void UpdateTextBoxAutoComplete()
+        {
+            AutoCompleteStringCollection COLSeries = new AutoCompleteStringCollection();
+
+            ConfigurationManager manager = new ConfigurationManager();
+
+            DirectoryInfo info = new DirectoryInfo(StaticInfo.LocalSeriesPath);
+
+            foreach (FileInfo file in info.GetFiles())
+            {
+                JObject JOserie = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(StaticInfo.LocalSeriesPath + file.Name));
+                CLSerie serie = manager.GetSeriesFromJson(JOserie);
+                COLSeries.Add(serie.name);
+            }
+
+            //#1 start: Adds autocompletion options to the textbox. They are taken from the GetSerieNames method which gets it from 
+            //the database
+            if (StaticInfo.CurrentDatabase != null)
+            {
+                List<string> serieNames = GetSerieNames();
+
+                foreach (string name in serieNames)
+                {
+                    if (!COLSeries.Contains(name))
+                        COLSeries.Add(name);
+                }
+            }
+            //#1 end.
+
+            txt_Search.AutoCompleteCustomSource = COLSeries;
+        }
+
+        void SetUploadSuggestions()
+        {
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
+            MySqlConnection con = new MySqlConnection(dbconf.GetConnectionstring());
+            MySqlCommand cmd = new MySqlCommand("select distinct ShowName from (Select * from Series order by UploadTimeStamp) as s limit 10", con);
+            if (StaticInfo.CurrentDatabase == null)
+                return;
+            con.Open();
+            MySqlDataReader reader = cmd.ExecuteReader();
+            List<string> shows = new List<string>();
+            while (reader.Read())
+            {
+                shows.Add(reader["ShowName"].ToString());
+            }
+            con.Close();
+            if (shows.Count > 0)
+            {
+                //Since it is ordered by UploadTimeStamp(changing SQL query from ASC to DESC doesent seem to do anything so i just reverse the list instead)
+                shows.Reverse();
+                List<KeyValuePair<string, int>> ShowsAndNumbers = new List<KeyValuePair<string, int>>();
+                foreach (string name in shows)
+                {
+                    ConfigurationManager manager = new ConfigurationManager();
+
+                    lstVw_UploadSuggestions.Items.Add(name + ", episode: " + manager.LatestEpisode(name));
+                }
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            StartupCheck();
+        }
+
+        List<CLSerie> currentList = new List<CLSerie>();
+
         List<string> GetSerieNames()
         {
-            ConfigurationManager manager = new ConfigurationManager();
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
             if(string.IsNullOrWhiteSpace(StaticInfo.CurrentDatabase.DatabaseName))
                 return new List<string>();
 
             Database database = StaticInfo.CurrentDatabase;
-            MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
+            MySqlConnection con = new MySqlConnection(dbconf.GetConnectionstring());
             MySqlCommand cmd = new MySqlCommand("Select ShowName from Series GROUP BY ShowName", con);
             con.Open();
             List<string> showNames = new List<string>();
@@ -92,84 +159,8 @@ namespace GUISeries
             return showNames;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            StartupCheck();
-        }
-
-        void UpdateTextBoxAutoComplete()
-        {
-            AutoCompleteStringCollection COLSeries = new AutoCompleteStringCollection();
-
-            ConfigurationManager manager = new ConfigurationManager();
-
-            DirectoryInfo info = new DirectoryInfo(StaticInfo.LocalSeriesPath);
-
-            foreach(FileInfo file in info.GetFiles())
-            {
-                JObject JOserie = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(StaticInfo.LocalSeriesPath + file.Name));
-                CLSerie serie = manager.GetSeriesFromJson(JOserie);
-                COLSeries.Add(serie.name);
-            }
-
-            //#1 start: Adds autocompletion options to the textbox. They are taken from the GetSerieNames method which gets it from 
-            //the database
-            if(StaticInfo.CurrentDatabase != null)
-            {
-                List<string> serieNames = GetSerieNames();
-
-                foreach (string name in serieNames)
-                {
-                    if(!COLSeries.Contains(name))
-                        COLSeries.Add(name);
-                }
-            }
-            //#1 end.
-
-            txt_Search.AutoCompleteCustomSource = COLSeries;
-        }
-
-        void SetUploadSuggestions()
-        {
-            //Get the most recent database uploads(CreationTimeStamp, not watchTimeStamp.) Then search the database for the 'highest' 
-            //number episode in that series that the user has watched. Put that serie in the lstVw_UploadSuggestions, do this for like the 
-            //5-10 most recent uploads, if there are that many. 
-            ConfigurationManager manager = new ConfigurationManager();
-            MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
-            MySqlCommand cmd = new MySqlCommand("select distinct ShowName from (Select * from Series order by UploadTimeStamp) as s limit 10", con);
-            if (StaticInfo.CurrentDatabase == null)
-                return;
-            con.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            List<string> shows = new List<string>();
-            while(reader.Read())
-            {
-                shows.Add(reader["ShowName"].ToString());
-            }
-            con.Close();
-            if (shows.Count > 0)
-            {
-                //Since it is ordered by UploadTimeStamp(changing SQL query from ASC to DESC doesent seem to do anything so i just reverse the list instead)
-                shows.Reverse();
-                List<KeyValuePair<string, int>> ShowsAndNumbers = new List<KeyValuePair<string, int>>();
-                foreach (string name in shows)
-                {
-                    lstVw_UploadSuggestions.Items.Add(name + ", episode: " + manager.LatestEpisode(name));
-                }
-            }
-        }
-
         private void lstVIew_ItemActivated(object sender, EventArgs e)
         {
-            //When i make the api request i will put the serie names in the list view, here is one way of doing so, you take the strings 
-            //and put them into the listview1. Then when the user clicks one you check which one is selected and get the name from there.
-
-            //ListViewItem item = new ListViewItem();
-            //item.Name = "test";
-
-            //listView1.Items.Add("asd", "abd", "aad");
-            //listView1.Items.Add("you", "you", "you");
-
             //This is needed incase the user tries to select multiple series and press ENTER, you can only upload one serie at a time. 
             if(StaticInfo.CurrentDatabase == null)
             {

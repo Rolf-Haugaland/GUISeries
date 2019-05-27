@@ -28,6 +28,9 @@ namespace GUISeries
         public static string FuncDatabasesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\FunctionalDatabases.json";
         public static string NonFuncDatabasesPath = System.Environment.GetEnvironmentVariable("USERPROFILE") + "\\Documents\\GUISeries\\NonFunctionalDatabases.json";
 
+        /// <summary>
+        /// Uses UpdateFiles(); and //UpdateDB(); to keep the local files and database updated. 
+        /// </summary>
         private static void KeepUpdated()
         {
             bool first = true;
@@ -55,7 +58,7 @@ namespace GUISeries
         }
 
         /// <summary>
-        /// FUNCTION NOT READY YET
+        /// Pulls episodes that has a status that is not finished from the database and checks if there is an updated version and updates them.
         /// </summary>
         private static void UpdateDB(string NOTREADY)
         {
@@ -63,8 +66,8 @@ namespace GUISeries
             Thread.Sleep(100);
             if (CurrentDatabase == null)
                 goto loop2;
-            ConfigurationManager manager = new ConfigurationManager();
-            MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
+            MySqlConnection con = new MySqlConnection(dbconf.GetConnectionstring());
             MySqlCommand cmd = new MySqlCommand("SELECT * From Series where NOT Status = 'finished' OR Status is NULL", con);
 
             con.Open();
@@ -90,6 +93,7 @@ namespace GUISeries
                     name = reader["ShowName"].ToString(),
                     DBID = (int)reader["ID"]
                 };
+                OutdatedEpisodes.Add(OutdatedEpisode);
             }
             con.Close();
             OutdatedEpisodes.RemoveAll(x => x.status != "finished");
@@ -101,6 +105,7 @@ namespace GUISeries
                 CLSerie Finished = GetFinishedSerie(serie.showName);
                 if (Finished != null)
                 {
+                    ConfigurationManager manager = new ConfigurationManager();
                     manager.UpdateDBEntry(Finished);
                 }
             }
@@ -135,6 +140,9 @@ namespace GUISeries
             return null;
         }
 
+        /// <summary>
+        /// updates the local files
+        /// </summary>
         private static void UpdateFiles()
         {
             string APath = LocalSeriesPath;

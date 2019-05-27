@@ -25,7 +25,7 @@ namespace GUISeries
 
         private void LstBxSelectedValueChanged(object sender, EventArgs e)
         {
-            ConfigurationManager manager = new ConfigurationManager();
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
             if(lstBx_Databases.SelectedIndex != -1)
             {
                 Database database = databases[lstBx_Databases.SelectedIndex];
@@ -47,7 +47,7 @@ namespace GUISeries
                     {
                         try
                         {
-                            manager.RemoveDatabase(database, StaticInfo.NonFuncDatabasesPath);
+                            dbconf.RemoveDatabase(database, StaticInfo.NonFuncDatabasesPath);
                         }
                         catch
                         {
@@ -55,7 +55,7 @@ namespace GUISeries
                         }
                         try
                         {
-                            manager.RemoveDatabase(database, StaticInfo.FuncDatabasesPath);
+                            dbconf.RemoveDatabase(database, StaticInfo.FuncDatabasesPath);
                         }
                         catch
                         {
@@ -63,7 +63,7 @@ namespace GUISeries
                         }
                         try
                         {
-                            manager.RemoveDatabase(database, StaticInfo.DatabaseConfPath);
+                            dbconf.RemoveDatabase(database, StaticInfo.DatabaseConfPath);
                         }
                         catch
                         {
@@ -71,13 +71,13 @@ namespace GUISeries
                         }
                         if(StaticInfo.CurrentDatabase != null)
                         {
-                            if (manager.DatabaseCheckEqual(database, StaticInfo.CurrentDatabase))
+                            if (dbconf.DatabaseCheckEqual(database, StaticInfo.CurrentDatabase))
                             {
                                 DialogResult SetFunctional = MessageBox.Show("You just removed the database that was currently being used. Do you wish to set another functional database?", "Current " +
                                     "database was removed", MessageBoxButtons.YesNo);
                                 if (SetFunctional == DialogResult.Yes)
                                 {
-                                    List<Database> FuncDatabases = manager.GetFunctionalDatabases();
+                                    List<Database> FuncDatabases = dbconf.GetFunctionalDatabases();
                                     if (FuncDatabases.Count > 0)
                                         StaticInfo.CurrentDatabase = FuncDatabases[0];
                                     else
@@ -104,7 +104,7 @@ namespace GUISeries
                 else if(Action == "ChangeDefaultDatabase")
                 {
                     database = databases.Find(x => x.DatabaseName == lstBx_Databases.SelectedItem.ToString());
-                    manager.ChangeDefaultDB(database);
+                    dbconf.ChangeDefaultDB(database);
                     MessageBox.Show("New default database set, database IP: " + database.DatabaseIP + " database name: " + database.DatabasePort + " database name: " + database.DatabaseName);
                     this.Close();
                 }
@@ -125,8 +125,8 @@ namespace GUISeries
 
         void UpdateLstBx()
         {
-            ConfigurationManager manager = new ConfigurationManager();
-            databases = manager.GetDBFromFile(StaticInfo.DatabaseConfPath);
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
+            databases = dbconf.GetDBFromFile(StaticInfo.DatabaseConfPath);
             lstBx_Databases.Items.Clear();
             foreach (Database db in databases)
             {

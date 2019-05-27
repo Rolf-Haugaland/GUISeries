@@ -36,7 +36,7 @@ namespace GUISeries
                 return;
             }
 
-            ConfigurationManager manager = new ConfigurationManager();
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
             Database database = new Database()
             {
                 DatabaseName = txt_DBName.Text,
@@ -49,14 +49,14 @@ namespace GUISeries
                 database.DefaultDB = true;
             else
                 database.DefaultDB = false;
-            if (!manager.CheckDatabaseConnection(database))
+            if (!dbconf.CheckDatabaseConnection(database))
             {
                 DialogResult CantConnect = MessageBox.Show("Cannot connect to this database, do you want to keep it? You will have to attempt " +
                     "to reconfigure it later. If you believe the information is right, please check your internet connection and " +
                     "try again.", "Keep this database?", MessageBoxButtons.YesNo);
                 if(CantConnect == DialogResult.Yes)
                 {
-                    int resultInt = manager.AddDatabase(database);
+                    int resultInt = dbconf.AddDatabase(database);
                     if (resultInt == 1)
                     {
                         MessageBox.Show("This database already exists", "The database already exists");
@@ -66,7 +66,7 @@ namespace GUISeries
                     {
                         MessageBox.Show("Database added succsessfully, however, you may not use this database before you configure it in " +
                             "Configuration>Fix Databases");
-                        manager.AddNonFuncDB(database);
+                        dbconf.AddNonFuncDB(database);
                         this.Close();
                         return;
                     }
@@ -78,12 +78,12 @@ namespace GUISeries
             }
             else
             {
-                if(!manager.CheckIfTableExists(database))
+                if(!dbconf.CheckIfTableExists(database))
                 {
                     CheckDefault(database);
-                    manager.CreateTable(database, "");
-                    manager.AddDatabase(database);
-                    manager.AddFuncDBToFile(database);
+                    dbconf.CreateTable(database, "");
+                    dbconf.AddDatabase(database);
+                    dbconf.AddFuncDBToFile(database);
                     MessageBox.Show("Database added sucsessfully", "Sucsess");
                     UseDatabase(database);
                     this.Close();
@@ -91,12 +91,12 @@ namespace GUISeries
                 }
                 else
                 {
-                    bool valid = manager.CheckIfTableIsValid(database);
+                    bool valid = dbconf.CheckIfTableIsValid(database);
                     if(valid)
                     {
                         CheckDefault(database);
-                        manager.AddDatabase(database);
-                        manager.AddFuncDBToFile(database);
+                        dbconf.AddDatabase(database);
+                        dbconf.AddFuncDBToFile(database);
                         MessageBox.Show("Database added sucsessfully", "Sucsess");
                         UseDatabase(database);
                         this.Close();
@@ -115,9 +115,9 @@ namespace GUISeries
                             if(Confirm == DialogResult.Yes)
                             {
                                 CheckDefault(database);
-                                manager.CreateTable(database, "");
-                                manager.AddDatabase(database);
-                                manager.AddFuncDBToFile(database);
+                                dbconf.CreateTable(database, "");
+                                dbconf.AddDatabase(database);
+                                dbconf.AddFuncDBToFile(database);
                                 MessageBox.Show("Sucsessfully added the database", "Sucsess!");
                                 UseDatabase(database);
                                 this.Close();
@@ -145,8 +145,8 @@ namespace GUISeries
         /// <param name="database"></param>
         void CheckDefault(Database database)
         {
-            ConfigurationManager manager = new ConfigurationManager();
-            List<Database> databases = manager.GetDBFromFile(StaticInfo.DatabaseConfPath);
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
+            List<Database> databases = dbconf.GetDBFromFile(StaticInfo.DatabaseConfPath);
             Database DefaultDB = databases.Find(x => x.DefaultDB);
             if(DefaultDB != null)
             {
@@ -154,7 +154,7 @@ namespace GUISeries
                     "databasen", "Sette denne til default database?", MessageBoxButtons.YesNo);
                 if(result == DialogResult.Yes)
                 {
-                    manager.ChangeDefaultDB(database);
+                    dbconf.ChangeDefaultDB(database);
                 }
             }
         }

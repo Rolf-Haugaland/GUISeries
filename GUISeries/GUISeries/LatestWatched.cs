@@ -34,8 +34,8 @@ namespace GUISeries
         {
             List<CLSerie> WholeHistory = new List<CLSerie>();
 
-            ConfigurationManager manager = new ConfigurationManager();
-            MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
+            MySqlConnection con = new MySqlConnection(dbconf.GetConnectionstring());
 
             MySqlCommand cmd = new MySqlCommand("SELECT * FROM Series", con);
 
@@ -108,8 +108,8 @@ namespace GUISeries
         List<KeyValuePair<string, int>> GetKeyValuePairsFromDB()
         {
             List<KeyValuePair<string, int>> returnThis = new List<KeyValuePair<string, int>>();
-            ConfigurationManager manager = new ConfigurationManager();
-            MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
+            MySqlConnection con = new MySqlConnection(dbconf.GetConnectionstring());
             MySqlCommand cmd = new MySqlCommand("SELECT * FROM Series", con);
             con.Open();
             MySqlDataReader reader = cmd.ExecuteReader();
@@ -276,8 +276,8 @@ namespace GUISeries
 
         List<DateTime> DaysNotWatched()
         {
-            ConfigurationManager manager = new ConfigurationManager();
-            MySqlConnection con = new MySqlConnection(manager.GetConnectionstring());
+            DatabaseConfiguration dbconf = new DatabaseConfiguration();
+            MySqlConnection con = new MySqlConnection(dbconf.GetConnectionstring());
             MySqlCommand cmd = new MySqlCommand("SELECT * FROM Series", con);
 
             List<DateTime> AllDates = new List<DateTime>();

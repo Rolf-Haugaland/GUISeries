@@ -15,11 +15,11 @@ namespace GUISeries
         public RepairDB()
         {
             InitializeComponent();
-            databases = manager.GetDBFromFile(StaticInfo.NonFuncDatabasesPath);
+            databases = dbconf.GetDBFromFile(StaticInfo.NonFuncDatabasesPath);
             PutItemsInLstBx();
         }
         List<Database> databases = new List<Database>();
-        ConfigurationManager manager = new ConfigurationManager();
+        DatabaseConfiguration dbconf = new DatabaseConfiguration();
         void PutItemsInLstBx()
         {
             lstBx1.Items.Clear();
@@ -46,15 +46,15 @@ namespace GUISeries
                 " database port: " + removeme.DatabasePort, "Connect to this database?", MessageBoxButtons.YesNo);
             if(Connect == DialogResult.Yes)
             {
-                if(manager.CheckDatabaseConnection(removeme))
+                if(dbconf.CheckDatabaseConnection(removeme))
                 {
-                    if (manager.CheckIfTableExists(removeme))
+                    if (dbconf.CheckIfTableExists(removeme))
                     {
-                        if (manager.CheckIfTableIsValid(removeme))
+                        if (dbconf.CheckIfTableIsValid(removeme))
                         {
                             MessageBox.Show("Sucsess! The database is connectable and compatible. Adding it to functional databases...", "Sucsess!");
-                            manager.RemoveDatabase(removeme, StaticInfo.NonFuncDatabasesPath);
-                            manager.AddFuncDBToFile(removeme);
+                            dbconf.RemoveDatabase(removeme, StaticInfo.NonFuncDatabasesPath);
+                            dbconf.AddFuncDBToFile(removeme);
                         }
                         else
                         {
@@ -67,18 +67,18 @@ namespace GUISeries
                                 "and make it compatible with this program, proceed?", "Are you sure?", MessageBoxButtons.YesNoCancel);
                                 if (Confirm == DialogResult.Yes)
                                 {
-                                    manager.CreateTable(removeme, "");
-                                    manager.RemoveDatabase(removeme, StaticInfo.NonFuncDatabasesPath);
-                                    manager.AddFuncDBToFile(removeme);
+                                    dbconf.CreateTable(removeme, "");
+                                    dbconf.RemoveDatabase(removeme, StaticInfo.NonFuncDatabasesPath);
+                                    dbconf.AddFuncDBToFile(removeme);
                                 }
                             }
                         }
                     }
                     else
                     {
-                        manager.CreateTable(removeme, "");
-                        manager.RemoveDatabase(removeme, StaticInfo.NonFuncDatabasesPath);
-                        manager.AddFuncDBToFile(removeme);
+                        dbconf.CreateTable(removeme, "");
+                        dbconf.RemoveDatabase(removeme, StaticInfo.NonFuncDatabasesPath);
+                        dbconf.AddFuncDBToFile(removeme);
                     }
                 }
                 else
@@ -86,8 +86,8 @@ namespace GUISeries
                     DialogResult removeDB = MessageBox.Show("Unable to connect to the database, remove it?", "Unable to connect, remove?", MessageBoxButtons.YesNo);
                     if(removeDB == DialogResult.Yes)
                     {
-                        manager.RemoveDatabase(removeme, StaticInfo.DatabaseConfPath);
-                        manager.RemoveDatabase(removeme, StaticInfo.NonFuncDatabasesPath);
+                        dbconf.RemoveDatabase(removeme, StaticInfo.DatabaseConfPath);
+                        dbconf.RemoveDatabase(removeme, StaticInfo.NonFuncDatabasesPath);
                         this.Close();
                         return;
                     }
