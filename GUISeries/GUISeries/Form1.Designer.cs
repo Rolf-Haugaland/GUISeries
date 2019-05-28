@@ -37,12 +37,12 @@
             this.removeDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changeDefaultDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnStrp_RepairDB = new System.Windows.Forms.ToolStripMenuItem();
             this.myDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.latestEpisodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lbl_CurrentDatabase = new System.Windows.Forms.Label();
             this.lstVw_UploadSuggestions = new System.Windows.Forms.ListView();
             this.label1 = new System.Windows.Forms.Label();
-            this.mnStrp_RepairDB = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -131,6 +131,13 @@
             this.changeDefaultDatabaseToolStripMenuItem.Text = "Change default database";
             this.changeDefaultDatabaseToolStripMenuItem.Click += new System.EventHandler(this.ChangeDefaultDB_Click);
             // 
+            // mnStrp_RepairDB
+            // 
+            this.mnStrp_RepairDB.Name = "mnStrp_RepairDB";
+            this.mnStrp_RepairDB.Size = new System.Drawing.Size(205, 22);
+            this.mnStrp_RepairDB.Text = "Configure database";
+            this.mnStrp_RepairDB.Click += new System.EventHandler(this.mnStrp_RepairDB_Click);
+            // 
             // myDataToolStripMenuItem
             // 
             this.myDataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -178,13 +185,6 @@
             this.label1.Text = "Upload suggestions: (Have like naruto episode 5 here, if the user has watched epi" +
     "sode 4)";
             // 
-            // mnStrp_RepairDB
-            // 
-            this.mnStrp_RepairDB.Name = "mnStrp_RepairDB";
-            this.mnStrp_RepairDB.Size = new System.Drawing.Size(205, 22);
-            this.mnStrp_RepairDB.Text = "Configure database";
-            this.mnStrp_RepairDB.Click += new System.EventHandler(this.mnStrp_RepairDB_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -200,7 +200,6 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GeneralKeyDown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

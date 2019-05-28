@@ -136,16 +136,19 @@ namespace GUISeries
             for (int i = 0; LatestEpisodesInShows.Count > i; i++)
             {
                 var AllButNotAlreadyAdded = LatestEpisodesInShows.FindAll(x => !AlreadyAdded.Contains(x.Key));
+
                 var HighestNumberIndex = AllButNotAlreadyAdded.FindIndex(x => x.Value == AllButNotAlreadyAdded.Max(y => y.Value));
+
                 KeyValuePair<string, int> HighestIntKeyValPair = AllButNotAlreadyAdded[HighestNumberIndex];
-                listBox1.Items.Add(HighestIntKeyValPair.Key + ", Current episode: " + HighestIntKeyValPair.Value.ToString());
+
+                listBox1.Items.Add(HighestIntKeyValPair.Key + ", Current episode: " + (HighestIntKeyValPair.Value + 1).ToString());
 
                 var OnlyCurrentShow = LatestEpisodesInShows.FindAll(x => x.Key == HighestIntKeyValPair.Key);
+
                 LatestEpisodesInShows.RemoveAll(x => x.Value != OnlyCurrentShow.Max(y => y.Value) && x.Key == HighestIntKeyValPair.Key);
 
                 AlreadyAdded.Add(HighestIntKeyValPair.Key);
             }
-
         }
 
         private void txt_Filter_TextChanged(object sender, EventArgs e)
@@ -153,7 +156,6 @@ namespace GUISeries
             UpdateListBox(txt_Filter.Text);
         }
 
-        // HEAD
         private void rdBtn_CheckChanged(object sender, EventArgs e)
         {
             RadioButton btn = (RadioButton)sender;

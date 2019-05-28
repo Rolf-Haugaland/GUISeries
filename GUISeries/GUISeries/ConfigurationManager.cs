@@ -251,7 +251,7 @@ namespace GUISeries
         //    MySqlCommand cmd = new MySqlCommand();
         //    string SQL = "UPDATE Series(EpisodeName,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,EpisodeLength,EpisodeNumber,SeasonNumber,ShowName,TimeStamp,Genres,Status) " +
         //        "VALUES(@Name,@EpisodeCount,@AgeRating,@NSFW,@Synopsis,@TotalShowLength,@Length,@EpisodeNumber,@SeasonNumber,@ShowName,@TimeStamp,@Genres,@Status),(";
-
+            
         //    MySqlParameter parName = new MySqlParameter()
         //    {
         //        ParameterName = "@Name",
@@ -327,7 +327,7 @@ namespace GUISeries
         //    SQL += " WHERE ID = '" + Serie.DBID.ToString() + "'";
         //}
 
-        
+
 
         public List<CLEpisode> GetEpisodes(CLSerie serie, int startEpisode, int endEpisode)
         {

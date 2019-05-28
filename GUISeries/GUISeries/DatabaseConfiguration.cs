@@ -94,10 +94,9 @@ namespace GUISeries
                 if (DatabaseCheckEqual(databases[i], database))
                 {
                     databases.RemoveAt(i);
-                    OverWriteDatabases(databases, path);
-                    return;
                 }
             }
+            OverWriteDatabases(databases, path);
         }
 
         /// <summary>

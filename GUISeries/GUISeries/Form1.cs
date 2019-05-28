@@ -20,6 +20,7 @@ namespace GUISeries
         public Form1()
         {
             InitializeComponent();
+            StartupCheck();
         }
 
         //All the things that happen on startup
@@ -28,16 +29,22 @@ namespace GUISeries
             //Creates the nessecary files and folders
             if (!Directory.Exists(StaticInfo.FolderPath))
                 Directory.CreateDirectory(StaticInfo.FolderPath);
+
             if (!Directory.Exists(StaticInfo.LocalSeriesPath))
                 Directory.CreateDirectory(StaticInfo.LocalSeriesPath);
+
             if (!File.Exists(StaticInfo.DatabaseConfPath))
                 File.Create(StaticInfo.DatabaseConfPath).Close();
+
             if (!File.Exists(StaticInfo.SettingsPath))
                 File.Create(StaticInfo.SettingsPath).Close();
+
             if (!File.Exists(StaticInfo.CheckSeriesPath))
                 File.Create(StaticInfo.CheckSeriesPath).Close();
+
             if (!File.Exists(StaticInfo.FuncDatabasesPath))
                 File.Create(StaticInfo.FuncDatabasesPath).Close();
+
             if (!File.Exists(StaticInfo.NonFuncDatabasesPath))
                 File.Create(StaticInfo.NonFuncDatabasesPath).Close();
 
@@ -126,17 +133,10 @@ namespace GUISeries
                 {
                     ConfigurationManager manager = new ConfigurationManager();
 
-                    lstVw_UploadSuggestions.Items.Add(name + ", episode: " + manager.LatestEpisode(name));
+                    lstVw_UploadSuggestions.Items.Add(name + ", episode: " + (manager.LatestEpisode(name) + 1));
                 }
             }
         }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            StartupCheck();
-        }
-
-        List<CLSerie> currentList = new List<CLSerie>();
 
         List<string> GetSerieNames()
         {
@@ -158,6 +158,8 @@ namespace GUISeries
             con.Close();
             return showNames;
         }
+
+        List<CLSerie> currentList = new List<CLSerie>();
 
         private void lstVIew_ItemActivated(object sender, EventArgs e)
         {
@@ -246,8 +248,7 @@ namespace GUISeries
             }
             else if (e.KeyCode == Keys.Enter)
                 btn_ConfirmSearch.PerformClick();
-
-            if (e.Control && e.KeyCode == Keys.L)
+            else if (e.Control && e.KeyCode == Keys.L)
             {
                 LatestWatched watched = new LatestWatched();
                 watched.ShowDialog();

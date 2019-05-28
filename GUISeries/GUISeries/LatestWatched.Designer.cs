@@ -50,7 +50,7 @@
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 20;
             this.listBox1.Location = new System.Drawing.Point(62, 53);
-            this.listBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.listBox1.Margin = new System.Windows.Forms.Padding(2);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(640, 104);
             this.listBox1.TabIndex = 1;
@@ -58,7 +58,7 @@
             // txt_Filter
             // 
             this.txt_Filter.Location = new System.Drawing.Point(263, 20);
-            this.txt_Filter.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txt_Filter.Margin = new System.Windows.Forms.Padding(2);
             this.txt_Filter.Name = "txt_Filter";
             this.txt_Filter.Size = new System.Drawing.Size(242, 20);
             this.txt_Filter.TabIndex = 2;
@@ -75,7 +75,7 @@
             this.SeasonNumber,
             this.TimeStamp});
             this.lstVw_ShowHistory.Location = new System.Drawing.Point(62, 209);
-            this.lstVw_ShowHistory.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.lstVw_ShowHistory.Margin = new System.Windows.Forms.Padding(2);
             this.lstVw_ShowHistory.Name = "lstVw_ShowHistory";
             this.lstVw_ShowHistory.Size = new System.Drawing.Size(640, 198);
             this.lstVw_ShowHistory.TabIndex = 3;
@@ -106,7 +106,7 @@
             // 
             this.rdBtn_OrderByName.AutoSize = true;
             this.rdBtn_OrderByName.Location = new System.Drawing.Point(107, 182);
-            this.rdBtn_OrderByName.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rdBtn_OrderByName.Margin = new System.Windows.Forms.Padding(2);
             this.rdBtn_OrderByName.Name = "rdBtn_OrderByName";
             this.rdBtn_OrderByName.Size = new System.Drawing.Size(96, 17);
             this.rdBtn_OrderByName.TabIndex = 4;
@@ -119,7 +119,7 @@
             // 
             this.rdBtn_OrderByDate.AutoSize = true;
             this.rdBtn_OrderByDate.Location = new System.Drawing.Point(206, 182);
-            this.rdBtn_OrderByDate.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rdBtn_OrderByDate.Margin = new System.Windows.Forms.Padding(2);
             this.rdBtn_OrderByDate.Name = "rdBtn_OrderByDate";
             this.rdBtn_OrderByDate.Size = new System.Drawing.Size(91, 17);
             this.rdBtn_OrderByDate.TabIndex = 5;
@@ -141,7 +141,7 @@
             // dtPicker
             // 
             this.dtPicker.Location = new System.Drawing.Point(301, 182);
-            this.dtPicker.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dtPicker.Margin = new System.Windows.Forms.Padding(2);
             this.dtPicker.Name = "dtPicker";
             this.dtPicker.Size = new System.Drawing.Size(182, 20);
             this.dtPicker.TabIndex = 11;
@@ -151,7 +151,7 @@
             // 
             this.cmbBox_AscOrDesc.FormattingEnabled = true;
             this.cmbBox_AscOrDesc.Location = new System.Drawing.Point(3, 181);
-            this.cmbBox_AscOrDesc.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cmbBox_AscOrDesc.Margin = new System.Windows.Forms.Padding(2);
             this.cmbBox_AscOrDesc.Name = "cmbBox_AscOrDesc";
             this.cmbBox_AscOrDesc.Size = new System.Drawing.Size(88, 21);
             this.cmbBox_AscOrDesc.TabIndex = 12;
@@ -173,7 +173,7 @@
             // 
             this.chkBx_DateOrAll.AutoSize = true;
             this.chkBx_DateOrAll.Location = new System.Drawing.Point(497, 185);
-            this.chkBx_DateOrAll.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.chkBx_DateOrAll.Margin = new System.Windows.Forms.Padding(2);
             this.chkBx_DateOrAll.Name = "chkBx_DateOrAll";
             this.chkBx_DateOrAll.Size = new System.Drawing.Size(141, 17);
             this.chkBx_DateOrAll.TabIndex = 14;
