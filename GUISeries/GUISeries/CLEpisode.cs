@@ -17,5 +17,6 @@ namespace GUISeries
         public string showName;
         public string seasonNumber;
         public DateTime TimeStamp;
+        public string linkToEpisode;
     }
 }

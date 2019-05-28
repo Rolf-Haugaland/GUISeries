@@ -244,88 +244,88 @@ namespace GUISeries
             con.Close();
         }
 
-        public void UpdateDBEntry(CLSerie Serie)
-        {
-            DatabaseConfiguration dbconf = new DatabaseConfiguration();
-            MySqlConnection con = new MySqlConnection(dbconf.GetConnectionstring());
-            MySqlCommand cmd = new MySqlCommand();
-            string SQL = "UPDATE Series(Name,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,Length,EpisodeNumber,SeasonNumber,ShowName,TimeStamp,Genres,Status) " +
-                "VALUES(@Name,@EpisodeCount,@AgeRating,@NSFW,@Synopsis,@TotalShowLength,@Length,@EpisodeNumber,@SeasonNumber,@ShowName,@TimeStamp,@Genres,@Status),(";
+        //public void UpdateDBEntry(List<CLSerie> Serie)
+        //{
+        //    DatabaseConfiguration dbconf = new DatabaseConfiguration();
+        //    MySqlConnection con = new MySqlConnection(dbconf.GetConnectionstring());
+        //    MySqlCommand cmd = new MySqlCommand();
+        //    string SQL = "UPDATE Series(EpisodeName,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,EpisodeLength,EpisodeNumber,SeasonNumber,ShowName,TimeStamp,Genres,Status) " +
+        //        "VALUES(@Name,@EpisodeCount,@AgeRating,@NSFW,@Synopsis,@TotalShowLength,@Length,@EpisodeNumber,@SeasonNumber,@ShowName,@TimeStamp,@Genres,@Status),(";
 
-            MySqlParameter parName = new MySqlParameter()
-            {
-                ParameterName = "@Name",
-                Value = Serie.episodeName
-            };
-            cmd.Parameters.Add(parName);
-            MySqlParameter parEpisodeCount = new MySqlParameter()
-            {
-                ParameterName = "@EpisodeCount",
-                Value = Serie.episodeCount
-            };
-            cmd.Parameters.Add(parEpisodeCount);
-            MySqlParameter parAgeRating = new MySqlParameter()
-            {
-                ParameterName = "@AgeRating",
-                Value = Serie.ageRating
-            };
-            cmd.Parameters.Add(parAgeRating);
-            MySqlParameter parNSFW = new MySqlParameter()
-            {
-                ParameterName = "@NSFW",
-                Value = Serie.NSFW
-            };
-            cmd.Parameters.Add(parNSFW);
-            MySqlParameter parSynopsis = new MySqlParameter()
-            {
-                ParameterName = "@Synopsis",
-                Value = Serie.synopsis
-            };
-            cmd.Parameters.Add(parSynopsis);
-            MySqlParameter parTotalShowLength = new MySqlParameter()
-            {
-                ParameterName = "@TotalShowLength",
-                Value = Serie.totalLength
-            };
-            cmd.Parameters.Add(parTotalShowLength);
-            MySqlParameter parLength = new MySqlParameter()
-            {
-                ParameterName = "@Length",
-                Value = Serie.length
-            };
-            cmd.Parameters.Add(parLength);
-            MySqlParameter parEpisodeNumber = new MySqlParameter()
-            {
-                ParameterName = "@EpisodeNumber",
-                Value = Serie.EpisodeNumber
-            };
-            cmd.Parameters.Add(parEpisodeNumber);
-            MySqlParameter parSeasonNumber = new MySqlParameter()
-            {
-                ParameterName = "@SeasonNumber",
-                Value = Serie.seasonNumber
-            };
-            cmd.Parameters.Add(parSeasonNumber);
-            MySqlParameter parShowName = new MySqlParameter()
-            {
-                ParameterName = "@ShowName",
-                Value = Serie.name
-            };
-            cmd.Parameters.Add(parShowName);
-            MySqlParameter parGenres = new MySqlParameter()
-            {
-                ParameterName = "@Genres",
-                Value = Serie.genres
-            };
-            cmd.Parameters.Add(parGenres);
-            MySqlParameter parStatus = new MySqlParameter()
-            {
-                ParameterName = "@Status",
-                Value = Serie.status
-            };
+        //    MySqlParameter parName = new MySqlParameter()
+        //    {
+        //        ParameterName = "@Name",
+        //        Value = Serie.episodeName
+        //    };
+        //    cmd.Parameters.Add(parName);
+        //    MySqlParameter parEpisodeCount = new MySqlParameter()
+        //    {
+        //        ParameterName = "@EpisodeCount",
+        //        Value = Serie.episodeCount
+        //    };
+        //    cmd.Parameters.Add(parEpisodeCount);
+        //    MySqlParameter parAgeRating = new MySqlParameter()
+        //    {
+        //        ParameterName = "@AgeRating",
+        //        Value = Serie.ageRating
+        //    };
+        //    cmd.Parameters.Add(parAgeRating);
+        //    MySqlParameter parNSFW = new MySqlParameter()
+        //    {
+        //        ParameterName = "@NSFW",
+        //        Value = Serie.NSFW
+        //    };
+        //    cmd.Parameters.Add(parNSFW);
+        //    MySqlParameter parSynopsis = new MySqlParameter()
+        //    {
+        //        ParameterName = "@Synopsis",
+        //        Value = Serie.synopsis
+        //    };
+        //    cmd.Parameters.Add(parSynopsis);
+        //    MySqlParameter parTotalShowLength = new MySqlParameter()
+        //    {
+        //        ParameterName = "@TotalShowLength",
+        //        Value = Serie.totalLength
+        //    };
+        //    cmd.Parameters.Add(parTotalShowLength);
+        //    MySqlParameter parLength = new MySqlParameter()
+        //    {
+        //        ParameterName = "@Length",
+        //        Value = Serie.length
+        //    };
+        //    cmd.Parameters.Add(parLength);
+        //    MySqlParameter parEpisodeNumber = new MySqlParameter()
+        //    {
+        //        ParameterName = "@EpisodeNumber",
+        //        Value = Serie.EpisodeNumber
+        //    };
+        //    cmd.Parameters.Add(parEpisodeNumber);
+        //    MySqlParameter parSeasonNumber = new MySqlParameter()
+        //    {
+        //        ParameterName = "@SeasonNumber",
+        //        Value = Serie.seasonNumber
+        //    };
+        //    cmd.Parameters.Add(parSeasonNumber);
+        //    MySqlParameter parShowName = new MySqlParameter()
+        //    {
+        //        ParameterName = "@ShowName",
+        //        Value = Serie.name
+        //    };
+        //    cmd.Parameters.Add(parShowName);
+        //    MySqlParameter parGenres = new MySqlParameter()
+        //    {
+        //        ParameterName = "@Genres",
+        //        Value = Serie.genres
+        //    };
+        //    cmd.Parameters.Add(parGenres);
+        //    MySqlParameter parStatus = new MySqlParameter()
+        //    {
+        //        ParameterName = "@Status",
+        //        Value = Serie.status
+        //    };
 
-            SQL += " WHERE ID = '" + Serie.DBID.ToString() + "'";
-        }
+        //    SQL += " WHERE ID = '" + Serie.DBID.ToString() + "'";
+        //}
 
         
 
@@ -347,7 +347,8 @@ namespace GUISeries
                 //going on.
                 int Limitint = LowerIntTo20(Episodes);
                 Episodes -= Limitint;
-                using (HttpResponseMessage response = client.GetAsync(serie.linkToEpisodes + "?&[page]offset=" + offset + "&[page]limit=" + Limitint.ToString()).Result)
+                string Link = serie.linkToEpisodes + "?&[page]offset=" + offset + "&[page]limit=" + Limitint.ToString();
+                using (HttpResponseMessage response = client.GetAsync(Link).Result)
                 {
                     offset += Limitint;
                     if (response.IsSuccessStatusCode)
@@ -362,6 +363,7 @@ namespace GUISeries
                             JObject jObjectEpisode = (JObject)jTokenEpisode;
                             CLEpisode add = Newtonsoft.Json.JsonConvert.DeserializeObject<CLEpisode>(jObjectEpisode.ToString());
                             add.showName = serie.name;
+                            add.linkToEpisode = Link;
                             CLEpisodes.Add(add);
                         }
                     }

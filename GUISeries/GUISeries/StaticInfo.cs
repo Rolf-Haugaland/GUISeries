@@ -106,15 +106,19 @@ namespace GUISeries
             con.Close();
             if (OutdatedEpisodes.Count == 0)
                 return;
-
+            List<CLSerie> ToUpdate = new List<CLSerie>();
             foreach(CLSerie serie in OutdatedEpisodes)
             {
                 CLSerie Finished = GetFinishedSerie(serie.showName);
                 if (Finished != null)
                 {
-                    ConfigurationManager manager = new ConfigurationManager();
-                    manager.UpdateDBEntry(Finished);
+                    ToUpdate.Add(Finished);
                 }
+            }
+            if(ToUpdate.Count != 0)
+            {
+                ConfigurationManager manager = new ConfigurationManager();
+                //manager.UploadEpisodes();
             }
         }
 
