@@ -1,1 +1,0 @@
-"Insert into Series(Name,EpisodeCount,AgeRating,NSFW,Synopsis,TotalShowLength,Length,EpisodeNumber,SeasonNumber,ShowName,TimeStamp) VALUES('@Name1','@EpisodeCount1','@AgeRating1','@NSFW1','@Synopsis1','@TotalShowLength1','@Length1','@EpisodeNumber1','@SeasonNumber1','@ShowName1','@TimeStamp1')"
