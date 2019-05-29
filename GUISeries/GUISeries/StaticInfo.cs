@@ -50,7 +50,8 @@ namespace GUISeries
             if (lastCheck < DateTime.Now.AddDays(-1))
             {
                 UpdateFiles();
-                UpdateDB();// a few functions needs to be updated. You dont nessecarily need to get a finisehd series since the data will update weekly.
+                //UpdateDB();// a few functions in configurationmanager.updateepisodes for example 
+                //needs to be updated. You dont nessecarily need to get a finisehd series since the data will update weekly.
                 //So you want it to update daily from the API, not wait all the way until it is finished. Also configurationmanager.UpdateDBEntry(CLSerie) is not finished. 
             }
             else
@@ -60,7 +61,7 @@ namespace GUISeries
         /// <summary>
         /// Pulls episodes that has a status that is not finished from the database and checks if there is an updated version and updates them.
         /// </summary>
-        private static void UpdateDB()//string NOTREADY)
+        private static void UpdateDB(string NOTREADY)
         {
         loop2:
             Thread.Sleep(100);
